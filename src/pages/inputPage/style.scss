@@ -63,8 +63,10 @@
 
 
     .drag-area {
-        width: 500px;
-        height: 300px;
+        width: 50%;
+        height: 50%;
+        min-width: 350px;
+        min-height: 300px;
         border: 2px dashed #0000006c;
         display: flex;
         flex-direction: column;
