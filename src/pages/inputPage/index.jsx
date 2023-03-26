@@ -8,6 +8,8 @@ import { saveAs } from 'file-saver';
 import Excel from 'exceljs';
 // impor
 
+import { useNavigate } from 'react-router';
+
 export default function InputPage() {
     const [excelFile, setExcelFile] = useState(null);
 
@@ -28,7 +30,7 @@ export default function InputPage() {
     const [playerPayoffFunctionError, setPlayerPayoffFunctionError] = useState("");
 
 
-
+    const navigate = useNavigate();
     // useEffect(() => {
     //     console.log("file", excelFile);
     // }, [excelFile]);
@@ -110,7 +112,7 @@ export default function InputPage() {
         sheet1.addRow(["Number of properties of each normal player", Number(normalPlayerPropsNum)]);
         sheet1.addRow(["Fitness function", fitnessFunction]);
         sheet1.addRow(["Player payoff function", playerPayoffFunction]);
-        
+
         sheet1.getColumn(1).width = 40;
         sheet1.getColumn(1).alignment = { horizontal: 'left' };
         sheet1.getColumn(2).width = 50;
@@ -143,15 +145,13 @@ export default function InputPage() {
         event.preventDefault();
         setExcelFile(event.dataTransfer.files[0]);
         event.target.classList.remove("dragging")
-        if (excelFile) {
-            const extension = excelFile.name.split(".").pop();
-            console.log(extension);
-            if (extension !== "xlsx") {
-                alert("Invalid file type");
-                setExcelFile(null);
-                return;
-            }
-        }
+        //TODO: handle file validation
+        // if (excelFile) {
+        //     const extension = excelFile.name.split(".").pop();
+        //     console.log(extension);
+        // }
+        navigate('/input-processing');
+
     }
 
     const handleOnDragEnter = (event) => {
