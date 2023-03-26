@@ -1,4 +1,5 @@
 .input {
+    position: relative;
     border: 1px solid black;
     padding: 7px 10px;
     border-radius: 5px;
@@ -29,6 +30,17 @@
 
         &:hover {
             cursor: pointer;
+        }
+    }
+
+    
+}
+
+.error {
+    border: 1.5px solid red;
+    input {
+        &::placeholder {
+            color: red;
         }
     }
 }

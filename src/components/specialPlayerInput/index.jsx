@@ -4,13 +4,9 @@ import Input from "../../components/input";
 import { useState, useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
 
-export default function SpecialPlayerInput() {
-    const [checked, setChecked] = useState(false);
+export default function SpecialPlayerInput({ specialPlayerExists, setSpecialPlayerExists, specialPlayerPropsNum, setSpecialPlayerPropsNum, error }) {
     const [style, setStyle] = useState("hidden");
 
-    const handleCheck = (e) => {
-        setChecked(e.target.checked);
-    }
 
     const handleHidingAnimationEnd = (e) => {
         if (style === 'hiding') {
@@ -22,22 +18,38 @@ export default function SpecialPlayerInput() {
     }
 
     useEffect(() => {
-        if (checked) {
+        if (specialPlayerExists) {
             setStyle('showing');
         } else {
             setStyle('hidden');
         }
-    }, [checked]);
+    }, [specialPlayerExists]);
     return (
         <div className={`special-player-input`}>
             <label htmlFor="special-player-checkbox" className='special-player-label'>
-                <input type="checkbox" placeholder="You problem name" id="special-player-checkbox" onChange={handleCheck} />
+                <input
+                    type="checkbox"
+                    placeholder="You problem name"
+                    id="special-player-checkbox"
+                    onChange={e => setSpecialPlayerExists(e.target.checked)} 
+                    value={specialPlayerExists}
+                    
+                />
                 <p>Special player exists</p>
             </label>
 
-            {/* {checked && */}
-            <div className={`${style}`} onAnimationEnd={handleHidingAnimationEnd}> <Input message="Number of properties of special player" /></div>
-            {/* } */}
+            <div className={`${style}`} onAnimationEnd={handleHidingAnimationEnd}>
+                <Input 
+                    message="Number of properties of special player" 
+                    type='number'
+                    error={error}
+                    handleOnChange={(e) => {
+                        console.log("e.target.value", e.target.value);
+                        setSpecialPlayerPropsNum(e.target.value)}}
+                    value={specialPlayerPropsNum}
+                    description=""
+                />
+            </div>
 
         </div>
     )

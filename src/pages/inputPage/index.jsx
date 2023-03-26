@@ -6,19 +6,101 @@ import Input from "../../components/input";
 import ExcelImage from '../../images/excel.png'
 import { saveAs } from 'file-saver';
 import Excel from 'exceljs';
-
+// impor
 
 export default function InputPage() {
     const [excelFile, setExcelFile] = useState(null);
-    console.log(excelFile);
 
-    useEffect(() => {
-        console.log("file", excelFile);
-    }, [excelFile]);
+    const [problemName, setProblemName] = useState("");
+    const [specialPlayerExists, setSpecialPlayerExists] = useState("");
+    const [specialPlayerPropsNum, setSpecialPlayerPropsNum] = useState(null);
+    const [normalPlayerNum, setNormalPlayerNum] = useState(null);
+    const [normalPlayerPropsNum, setNormalPlayerPropsNum] = useState(null);
+    const [fitnessFunction, setFitnessFunction] = useState("");
+    const [playerPayoffFunction, setPlayerPayoffFunction] = useState("");
 
+    const [problemNameError, setProblemNameError] = useState("");
+    const [specialPlayerExistsError, setSpecialPlayerExistsError] = useState("");
+    const [specialPlayerPropsNumError, setSpecialPlayerPropsNumError] = useState("");
+    const [normalPlayerNumError, setNormalPlayerNumError] = useState("");
+    const [normalPlayerPropsNumError, setNormalPlayerPropsNumError] = useState("");
+    const [fitnessFunctionError, setFitnessFunctionError] = useState("");
+    const [playerPayoffFunctionError, setPlayerPayoffFunctionError] = useState("");
+
+
+
+    // useEffect(() => {
+    //     console.log("file", excelFile);
+    // }, [excelFile]);
+
+    const handleGetExcelTemplate = () => {
+        if (validateForm()) {
+            console.log("No error");
+            downloadExcel();
+        }
+    }
+    const validateForm = () => {
+        let error = false
+
+        console.log("problem name", problemName);
+        if (!problemName) {
+            setProblemNameError("Problem name must not be empty");
+            error = true;
+        } else {
+            console.log("free name");
+            setProblemNameError("");
+        }
+
+        if (specialPlayerExists) {
+            if (!specialPlayerPropsNum) {
+                setSpecialPlayerPropsNumError("Special player properties must not be empty");
+                console.log("over thewre");
+                console.log(specialPlayerPropsNum);
+                error = true;
+            } else {
+                console.log('over here');
+                setSpecialPlayerPropsNumError("")
+            }
+        } 
+
+
+        if (!normalPlayerNum) {
+            setNormalPlayerNumError("Normal player number must not be empty");
+            error = true;
+        } else {
+            setNormalPlayerNumError("");
+        }
+
+        if (!normalPlayerPropsNum) {
+            setNormalPlayerPropsNumError("Normal player properties must not be empty");
+            error = true;
+        } else {
+            setNormalPlayerPropsNumError("");
+        }
+
+        if (!fitnessFunction) {
+            setFitnessFunctionError("Fitness function must not be empty");
+            error = true;
+        } else {
+            setFitnessFunctionError("");
+        }
+
+        if (!playerPayoffFunction) {
+            setPlayerPayoffFunctionError("Player payoff function must not be empty");
+            error = true;
+        } else {
+            setPlayerPayoffFunctionError("");
+        }
+
+        // if there is no error
+        if (error) {
+            return false
+        }
+        return true;
+
+    }
     const downloadExcel = () => {
         const workbook = new Excel.Workbook();
-        const sheet1 = workbook.addWorksheet('Guide');
         const sheet2 = workbook.addWorksheet('Special player');
         const sheet3 = workbook.addWorksheet('Normal player');
         const sheet4 = workbook.addWorksheet('Conflict matrix');
@@ -69,27 +151,67 @@ export default function InputPage() {
             <p className='header-text'>Enter information about your problem</p>
             <div className="input-container">
                 <div className="row">
-                    <Input message='Your problem name' />
+                    <Input
+                        message='Name of the problem'
+                        type='text'
+                        error={problemNameError}
+                        handleOnChange={(e) => setProblemName(e.target.value)}   
+                        value={problemName}
+                        descrition=""
+                    />
                 </div>
                 <div className="row">
-                    <SpecialPlayerInput />
+                    <SpecialPlayerInput 
+                        specialPlayerExists={specialPlayerExists}
+                        setSpecialPlayerExists={setSpecialPlayerExists}
+                        specialPlayerPropsNum={specialPlayerPropsNum}
+                        setSpecialPlayerPropsNum={setSpecialPlayerPropsNum}
+                        error={specialPlayerPropsNumError}
+                    />
                 </div>
 
                 <div className="row">
-                    <Input message='Number of normal players' />
-                    <Input message='Number of properties each strategy of normal player' />
-
+                    <Input 
+                    message='Number of normal players' 
+                    text='number' 
+                    error={normalPlayerNumError}
+                    handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
+                    value={normalPlayerNum}
+                    descrition=""
+                    />
+                    <Input 
+                    message='Number of properties each strategy of normal player' 
+                    text='number' 
+                    error={normalPlayerPropsNumError}
+                    handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
+                    value={normalPlayerPropsNum}
+                    descrition=""
+                    />
                 </div>
 
                 <div className="row">
-                    <Input message='Fitness function' />
+                    <Input 
+                    message='Fitness function' 
+                    type='text' 
+                    error={fitnessFunctionError}
+                    handleOnChange={(e) => setFitnessFunction(e.target.value)}
+                    value={fitnessFunction}
+                    descrition=""
+                    />
                 </div>
 
                 <div className="row">
-                    <Input message='Player payoff function' />
+                    <Input 
+                    message='Player payoff function' 
+                    type='text' 
+                    error={playerPayoffFunctionError}
+                    handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
+                    value={playerPayoffFunction}
+                    descrition=""
+                    />
                 </div>
             </div>
-            <div className="excel-btn" onClick={downloadExcel}>
+            <div className="btn" onClick={handleGetExcelTemplate}>
                 <p>Get Excel Template</p>
                 <img src={ExcelImage} alt="" />
             </div>
@@ -101,7 +223,7 @@ export default function InputPage() {
             >
                 <p className='drag-text'>{excelFile ? excelFile.name : 'Drag and drop a file here'}</p>
                 <label htmlFor="select-file" id='select-file-label'>Choose a file</label>
-                <input type="file" id="select-file" onChange={handleFileInput} />
+                <input type="file" id="select-file" handleOnChange={handleFileInput} />
             </div>
         </div>
     )
@@ -117,5 +239,5 @@ export default function InputPage() {
 // <div className="drag-area" onDrop={handleDrop} onDragEnter={handleOnDragEnter} onDragLeave={handleOnDragLeave}>
 //     <p className='drag-text'>{excelFile ? excelFile.name : 'Drag and drop a file here'}</p>
 //     <label htmlFor="select-file" id='select-file-label'>Choose a file</label>
-//     <input type="file" id="select-file" onChange={handleFileInput} />
+//     <input type="file" id="select-file" handleOnChange={handleFileInput} />
 // </div>
