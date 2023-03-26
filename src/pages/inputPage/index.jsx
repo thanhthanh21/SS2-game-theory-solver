@@ -61,7 +61,7 @@ export default function InputPage() {
                 console.log('over here');
                 setSpecialPlayerPropsNumError("")
             }
-        } 
+        }
 
 
         if (!normalPlayerNum) {
@@ -101,7 +101,32 @@ export default function InputPage() {
     }
     const downloadExcel = () => {
         const workbook = new Excel.Workbook();
-        const sheet2 = workbook.addWorksheet('Special player');
+        const sheet1 = workbook.addWorksheet('Problem information')
+
+        sheet1.addRow(["Problem name", problemName]);
+        sheet1.addRow(["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0]);
+        sheet1.addRow(["Number of properties of special player", Number(specialPlayerPropsNum)]);
+        sheet1.addRow(["Number of normal players", Number(normalPlayerNum)]);
+        sheet1.addRow(["Number of properties of each normal player", Number(normalPlayerPropsNum)]);
+        sheet1.addRow(["Fitness function", fitnessFunction]);
+        sheet1.addRow(["Player payoff function", playerPayoffFunction]);
+        
+        sheet1.getColumn(1).width = 40;
+        sheet1.getColumn(1).alignment = { horizontal: 'left' };
+        sheet1.getColumn(2).width = 50;
+        sheet1.getColumn(2).alignment = { horizontal: 'left' };
+
+
+        if (specialPlayerExists) {
+            const sheet2 = workbook.addWorksheet('Special player');
+            sheet2.addRow(["Properties", "Weights"])
+            sheet2.getColumn(1).width = 20;
+            sheet2.getColumn(1).alignment = { horizontal: 'middle' };
+            sheet2.getColumn(2).width = 20;
+            sheet2.getColumn(2).alignment = { horizontal: 'middle' };
+        }
+
+
         const sheet3 = workbook.addWorksheet('Normal player');
         const sheet4 = workbook.addWorksheet('Conflict matrix');
 
@@ -155,13 +180,13 @@ export default function InputPage() {
                         message='Name of the problem'
                         type='text'
                         error={problemNameError}
-                        handleOnChange={(e) => setProblemName(e.target.value)}   
+                        handleOnChange={(e) => setProblemName(e.target.value)}
                         value={problemName}
                         descrition=""
                     />
                 </div>
                 <div className="row">
-                    <SpecialPlayerInput 
+                    <SpecialPlayerInput
                         specialPlayerExists={specialPlayerExists}
                         setSpecialPlayerExists={setSpecialPlayerExists}
                         specialPlayerPropsNum={specialPlayerPropsNum}
@@ -171,43 +196,43 @@ export default function InputPage() {
                 </div>
 
                 <div className="row">
-                    <Input 
-                    message='Number of normal players' 
-                    text='number' 
-                    error={normalPlayerNumError}
-                    handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
-                    value={normalPlayerNum}
-                    descrition=""
+                    <Input
+                        message='Number of normal players'
+                        text='number'
+                        error={normalPlayerNumError}
+                        handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
+                        value={normalPlayerNum}
+                        descrition=""
                     />
-                    <Input 
-                    message='Number of properties each strategy of normal player' 
-                    text='number' 
-                    error={normalPlayerPropsNumError}
-                    handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
-                    value={normalPlayerPropsNum}
-                    descrition=""
-                    />
-                </div>
-
-                <div className="row">
-                    <Input 
-                    message='Fitness function' 
-                    type='text' 
-                    error={fitnessFunctionError}
-                    handleOnChange={(e) => setFitnessFunction(e.target.value)}
-                    value={fitnessFunction}
-                    descrition=""
+                    <Input
+                        message='Number of properties each strategy of normal player'
+                        text='number'
+                        error={normalPlayerPropsNumError}
+                        handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
+                        value={normalPlayerPropsNum}
+                        descrition=""
                     />
                 </div>
 
                 <div className="row">
-                    <Input 
-                    message='Player payoff function' 
-                    type='text' 
-                    error={playerPayoffFunctionError}
-                    handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
-                    value={playerPayoffFunction}
-                    descrition=""
+                    <Input
+                        message='Fitness function'
+                        type='text'
+                        error={fitnessFunctionError}
+                        handleOnChange={(e) => setFitnessFunction(e.target.value)}
+                        value={fitnessFunction}
+                        descrition=""
+                    />
+                </div>
+
+                <div className="row">
+                    <Input
+                        message='Player payoff function'
+                        type='text'
+                        error={playerPayoffFunctionError}
+                        handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
+                        value={playerPayoffFunction}
+                        descrition=""
                     />
                 </div>
             </div>
