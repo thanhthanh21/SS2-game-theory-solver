@@ -1,12 +1,16 @@
 import React from "react";
 import "./style.scss";
-
+import { useNavigate } from "react-router";
 export default function Header() {
+    const navigate = useNavigate();
+    const backToHome = () => {
+        navigate("/");
+    };
     return (
         <>
             <header className="Navbar">
                 <div className="container">
-                    <div className="app-name">Game Theory Solver</div>
+                    <div className="app-name" onClick={backToHome}>Game Theory Solver</div>
                     <div className="nav-item-container">
                         <div className="nav-item highlight">Home</div>
                         <div className="nav-item">About</div>

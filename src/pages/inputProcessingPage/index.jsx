@@ -1,11 +1,16 @@
 // Phuc
 import React from 'react'
 import "./style.scss"
+import { useNavigate } from 'react-router'
 export default function InputProcessingPage() {
+    const navigate = useNavigate();
+    const handleSolveNow = () => {
+        navigate('/result')
+    }
     return (
         <div className='input-processing-page'>
             <h1 class ="Problem">Oil Price Problem</h1>
-            <button class= "click">Solve now</button>
+            <button class= "click" onClick={handleSolveNow}>Solve now</button>
             <p class ="playerNum">20 players</p>
             <div class ="scrollBar">
                 <div class ="contend">
