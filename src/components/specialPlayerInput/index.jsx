@@ -2,7 +2,6 @@ import React from 'react';
 import "./style.scss";
 import Input from "../../components/input";
 import { useState, useEffect } from 'react';
-import { CSSTransition } from 'react-transition-group';
 
 export default function SpecialPlayerInput({ specialPlayerExists, setSpecialPlayerExists, specialPlayerPropsNum, setSpecialPlayerPropsNum, error }) {
     const [style, setStyle] = useState("hidden");
