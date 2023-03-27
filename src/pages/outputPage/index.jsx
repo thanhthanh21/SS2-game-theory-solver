@@ -1,6 +1,10 @@
 // Lam
 import React from 'react'
 import "./style.scss"
+import PlayerResult from '../../components/PlayerResult'
+import ExcelImage from '../../images/excel.png'
+import GraphImage from '../../images/graph1.png'
+
 export default function OutputPage() {
     return (
         <div className='output-page'>
@@ -9,11 +13,13 @@ export default function OutputPage() {
             <p class='below-headertext'> Optimal solution</p>
             <div className="output-container">
                 <div className="row">
-                    <div className='button'>
-                        <button type="button" >Export to Excel</button>
+                    <div className="btn" >
+                        <p>Export to Excel</p>
+                        <img src={ExcelImage} alt="" />
                     </div>
-                    <div className='button'>
-                        <button type="button"  >Get more insights</button>
+                    <div className="btn" >
+                        <p>Get more insights</p>
+                        <img src={GraphImage} alt="" />
                     </div>
                 </div>
             </div>
@@ -23,66 +29,21 @@ export default function OutputPage() {
 
             <div className="table-container">
                 <div className="grid-container">
-                    <div className="column">No</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
+                    <div className="column head-column">No</div>
+                    <div className="column head-column">Player Name</div>
+                    <div className="column head-column">Choosen strategy name</div>
+                    <div className="column head-column">Payoff value</div>
                 </div>
 
-                <div className="grid-item-container">
-                    <div className="column">#1</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#2</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#3</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#4</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#5</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#6</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#7</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#8</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
-                <div className="grid-item-container">
-                    <div className="column">#9</div>
-                    <div className="column">Player Name</div>
-                    <div className="column">Choosen strategy name</div>
-                    <div className="column">Payoff value</div>
-                </div>
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
+                <PlayerResult />
             </div>
 
 
