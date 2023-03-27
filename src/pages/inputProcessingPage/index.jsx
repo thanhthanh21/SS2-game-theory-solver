@@ -10,7 +10,7 @@ export default function InputProcessingPage() {
     return (
         <div className='input-processing-page'>
             <h1 className ="Problem">Oil Price Problem</h1>
-            <button className= "click">Solve now</button>
+            <button className= "click" onClick={handleSolveNow}>Solve now</button>
             <p className ="playerNum">20 players</p>
             <div className ="scrollBar">
                 <div className ="contend">
