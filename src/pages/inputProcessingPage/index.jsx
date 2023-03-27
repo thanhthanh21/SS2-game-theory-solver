@@ -9,18 +9,18 @@ export default function InputProcessingPage() {
     }
     return (
         <div className='input-processing-page'>
-            <h1 class ="Problem">Oil Price Problem</h1>
-            <button class= "click" onClick={handleSolveNow}>Solve now</button>
-            <p class ="playerNum">20 players</p>
-            <div class ="scrollBar">
-                <div class ="contend">
-                    <p class="name1">Oil Producing country A</p>
-                    <p class= "name1">3 Strategy</p>
+            <h1 className ="Problem">Oil Price Problem</h1>
+            <button className= "click">Solve now</button>
+            <p className ="playerNum">20 players</p>
+            <div className ="scrollBar">
+                <div className ="contend">
+                    <p className="name1">Oil Producing country A</p>
+                    <p className= "name1">3 Strategy</p>
                     <label for="btn">
-                        <span class="fas fa-caret-down name1"></span>
+                        <span className="fas fa-caret-down name1"></span>
                     </label>
-                    <input type="checkbox" name="btn" id="btn" />
-                    <div class = "menubar">
+                    <input type="checkbox" name="btn" id="btn" className='input' />
+                    <div className = "menubar">
                     <ul>    
                             <li>
                                 <p>Stratey 1: Lower the price</p>
@@ -35,14 +35,14 @@ export default function InputProcessingPage() {
                     </div>
                 </div>
                         
-                <div class ="contend">
-                    <p class="name1">Oil Producing country B</p>
-                    <p class= "name1">5 Strategy</p>
+                <div className ="contend">
+                    <p className="name1">Oil Producing country B</p>
+                    <p className= "name1">5 Strategy</p>
                     <label for="btn1">
-                        <span class="fas fa-caret-down name1"></span>
+                        <span className="fas fa-caret-down name1"></span>
                     </label>
-                    <input type="checkbox" name="btn" id="btn1" />
-                    <div class = "menubar">
+                    <input type="checkbox" name="btn" id="btn1" className='input' />
+                    <div className = "menubar">
                     <ul>    
                             <li class = "divcon">
                                 <p>Stratey 1: bla bla</p>
@@ -62,16 +62,16 @@ export default function InputProcessingPage() {
                     </ul>
                     </div>        
                 </div>
-                <div class ="contend">
-                    <p class="name1">Oil Producing country C</p>
-                    <p class= "name1">5 Strategy</p>
+                <div className ="contend">
+                    <p className="name1">Oil Producing country C</p>
+                    <p className= "name1">5 Strategy</p>
                     <label for="btn2">
-                        <span class="fas fa-caret-down name1"></span>
+                        <span className="fas fa-caret-down name1"></span>
                     </label>
-                    <input type="checkbox" name="btn" id="btn2" />
-                    <div class = "menubar">
+                    <input type="checkbox" name="btn" id="btn2" className='input' />
+                    <div className = "menubar">
                     <ul>    
-                            <li class = "divcon">
+                            <li className = "divcon">
                                 <p>Stratey 1: bla bla</p>
                             </li>
                             <li>
