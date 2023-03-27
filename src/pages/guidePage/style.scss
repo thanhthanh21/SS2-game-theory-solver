@@ -1,0 +1,52 @@
+.guide-page {
+    margin-top: 10px;
+    // height: 75vh;
+    display: grid;
+    grid-template-columns: 20% 80%;
+    // padding-left: 400px;
+    .sidebar {
+        position: sticky;
+        top: 20px;
+        left: 0;
+        border-right: 1px solid black;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        height: fit-content;
+        // height: 100%;
+        max-width: 300px;
+        // height: 75vh;
+        padding: 0 10px;
+
+        div {
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+
+            &:hover {
+                background: gray;
+                color: white;
+            }
+        }
+
+        .highlight {
+            color: white;
+            background: black;
+        }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        // height: 75vh;
+        padding: 0 20px;
+        overflow-y: scroll;
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+        }
+    }
+}

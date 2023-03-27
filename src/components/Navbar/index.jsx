@@ -1,20 +1,29 @@
 import React from "react";
 import "./style.scss";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation, Link  } from "react-router-dom";
+import { useState, useEffect } from 'react'
+
 export default function Header() {
+    const location = useLocation();
+    const [path, setPath] = useState("");
+    console.log(path == "/guide");
     const navigate = useNavigate();
     const backToHome = () => {
         navigate("/");
     };
+
+    useEffect(( ) => {
+        setPath(location.pathname)
+    }, [location])
     return (
         <>
             <header className="Navbar">
                 <div className="container">
                     <div className="app-name" onClick={backToHome}>Game Theory Solver</div>
                     <div className="nav-item-container">
-                        <div className="nav-item highlight">Home</div>
-                        <div className="nav-item">About</div>
-                        <div className="nav-item">Guide</div>
+                        <div className={path == "/" ? "nav-item highlight" : 'nav-item'}>Home</div>
+                        <Link to='/guide' className={path == "/guide" ? "nav-item highlight" : 'nav-item'}>Guide</Link>
+                        <div className={path == "/about" ? "nav-item highlight" : 'nav-item'}>About</div>
                     </div>
                 </div>
 
