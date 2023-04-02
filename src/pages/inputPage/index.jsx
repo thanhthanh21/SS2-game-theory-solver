@@ -5,8 +5,11 @@ import SpecialPlayerInput from "../../components/specialPlayerInput";
 import Input from "../../components/input";
 import ExcelImage from '../../images/excel.png'
 import { saveAs } from 'file-saver';
-import Excel from 'exceljs';
-// impor
+import * as XLSX from 'xlsx';
+/* load 'fs' for readFile and writeFile support */
+// import * as fs from 'fs';
+// XLSX.set_fs(fs);
+// // impor
 
 import { useNavigate } from 'react-router';
 
@@ -30,14 +33,135 @@ export default function InputPage() {
     const [playerPayoffFunctionError, setPlayerPayoffFunctionError] = useState("");
 
 
+    const [excelFileError, setExcelFileError] = useState('');
+
+    const [data, setData] = useState(null)
+
+
     const navigate = useNavigate();
     // useEffect(() => {
     //     console.log("file", excelFile);
     // }, [excelFile]);
 
+    useEffect(() => {
+        if (excelFile) {
+            const extension = excelFile.name.split(".").pop();
+            console.log(extension);
+
+            if (extension === "xlsx") {
+                setExcelFileError("");
+                console.log("file", excelFile);
+                const data = readExcelFile(excelFile);
+            } else {
+                setExcelFileError("Not an Excel file");
+            }
+        }
+    }, [excelFile])
+
+    const readExcelFile = (file) => {
+        const reader = new FileReader();
+        try {
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+    
+                const problemName = worksheet["B1"].v
+                const specialPlayerExists = worksheet["B2"].v
+                const specialPlayerPropsNum = worksheet["B3"].v
+                const normalPlayerNum = worksheet["B4"].v
+                const normalPlayerPropsNum = worksheet["B5"].v
+                const fitnessFunction = worksheet["B6"].v
+                const playerPayoffFunction = worksheet["B7"].v
+    
+                setProblemName(problemName);
+                setSpecialPlayerExists(specialPlayerExists);
+                setSpecialPlayerPropsNum(specialPlayerPropsNum);
+                setNormalPlayerNum(normalPlayerNum);
+                setNormalPlayerPropsNum(normalPlayerPropsNum);
+                setFitnessFunction(fitnessFunction);
+                setPlayerPayoffFunction(playerPayoffFunction);
+    
+                
+                if (specialPlayerExists) {
+                    const specialPlayerSheet = workbook.SheetNames[1];
+                    const worksheet = workbook.Sheets[specialPlayerSheet];
+                    const properties = []
+                    const weights = []
+
+                    for (let i = 1; i <= specialPlayerPropsNum; i++) {
+                        // the first row is the header
+                        properties.push(worksheet[`A${i+1}`].v)
+                        weights.push(worksheet[`B${i+1}`].v)
+                    }
+                    
+                    console.log("properties", properties);
+                    console.log("weights", weights);
+
+                    const normalPlayerSheet = workbook.SheetNames[2];
+                    console.log("normal player sheet", normalPlayerSheet);
+                    const worksheet2 = workbook.Sheets[normalPlayerSheet];
+                    const players = [];
+                    let currentPlayer = 0;
+                    let currentRow = 1;
+
+                    while (players.length < normalPlayerNum) {
+                        console.log("current row", currentRow);
+                        const playerNameCell = worksheet2[`A${currentRow}`];
+                        
+                        const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
+                        console.log("player name", playerName);
+                        const strategyNumber = worksheet2[`B${currentRow}`].v;
+                        console.log("strategy number", strategyNumber);
+
+                        const strategies = [];
+
+                        //LOAD STRATEGIES
+                        for (let i = 1; i <= strategyNumber; i++) {
+                            const strategyNameCell = worksheet2[`A${currentRow + i}`];
+                            
+                            const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
+                            console.log("strategy name", strategyName);
+                            const properties = []
+
+                            //LOAD PROPERTIES
+                            for (let j = 0; j < normalPlayerPropsNum; j++) {
+                                const propertyCell = worksheet2[XLSX.utils.encode_cell({ c: j + 1, r: currentRow + i - 1} )]; // first column is the strategy name,
+                            
+                                console.log("property cell: ", propertyCell);
+                                properties.push(propertyCell.v)
+                            }
+
+                            strategies.push({
+                                name: strategyName,
+                                properties: properties
+                            })
+
+                        }
+
+                        
+                        currentRow += strategyNumber + 1;
+
+
+                        players.push({
+                            name: playerName,
+                            strategies: strategies
+                        })
+                    }
+                    console.log("players", players);
+                }
+    
+            };
+            reader.readAsBinaryString(file);
+        } catch (error) {
+            console.log(error);
+            setExcelFileError("Error when reading file");
+        }
+    };
+
     const handleGetExcelTemplate = () => {
         if (validateForm()) {
-            console.log("No error");
             downloadExcel();
         }
     }
@@ -101,56 +225,48 @@ export default function InputPage() {
         return true;
 
     }
+
     const downloadExcel = () => {
-        const workbook = new Excel.Workbook();
-        const sheet1 = workbook.addWorksheet('Problem information')
+        const workbook = XLSX.utils.book_new();
+        const sheet1 = XLSX.utils.aoa_to_sheet([
+            ["Problem name", problemName],
+            ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],
+            ["Number of properties of special player", Number(specialPlayerPropsNum)],
+            ["Number of normal players", Number(normalPlayerNum)],
+            ["Number of properties of each normal player", Number(normalPlayerPropsNum)],
+            ["Fitness function", fitnessFunction],
+            ["Player payoff function", playerPayoffFunction]
+        ]);
 
-        sheet1.addRow(["Problem name", problemName]);
-        sheet1.addRow(["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0]);
-        sheet1.addRow(["Number of properties of special player", Number(specialPlayerPropsNum)]);
-        sheet1.addRow(["Number of normal players", Number(normalPlayerNum)]);
-        sheet1.addRow(["Number of properties of each normal player", Number(normalPlayerPropsNum)]);
-        sheet1.addRow(["Fitness function", fitnessFunction]);
-        sheet1.addRow(["Player payoff function", playerPayoffFunction]);
-
-        sheet1.getColumn(1).width = 40;
-        sheet1.getColumn(1).alignment = { horizontal: 'left' };
-        sheet1.getColumn(2).width = 50;
-        sheet1.getColumn(2).alignment = { horizontal: 'left' };
-
+        XLSX.utils.book_append_sheet(workbook, sheet1, 'Problem information');
+        // XLSX.utils.sheet_set_column_width(sheet1, 1, 1, 40);
+        // XLSX.utils.sheet_set_column_width(sheet1, 2, 2, 50);
 
         if (specialPlayerExists) {
-            const sheet2 = workbook.addWorksheet('Special player');
-            sheet2.addRow(["Properties", "Weights"])
-            sheet2.getColumn(1).width = 20;
-            sheet2.getColumn(1).alignment = { horizontal: 'middle' };
-            sheet2.getColumn(2).width = 20;
-            sheet2.getColumn(2).alignment = { horizontal: 'middle' };
+            const sheet2 = XLSX.utils.aoa_to_sheet([["Properties", "Weights"]]);
+            XLSX.utils.book_append_sheet(workbook, sheet2, 'Special player');
+            // XLSX.utils.sheet_format_cols(sheet2, [{ wch: 20 }, { wch: 20 }]);
+            // XLSX.utils.sheet_set_column_width(sheet2, 1, 1, 20);
+            // XLSX.utils.sheet_set_column_width(sheet2, 2, 2, 20);
         }
 
+        const sheet3 = XLSX.utils.aoa_to_sheet([]);
+        XLSX.utils.book_append_sheet(workbook, sheet3, 'Normal player');
+        const sheet4 = XLSX.utils.aoa_to_sheet([]);
+        XLSX.utils.book_append_sheet(workbook, sheet4, 'Conflict matrix');
 
-        const sheet3 = workbook.addWorksheet('Normal player');
-        const sheet4 = workbook.addWorksheet('Conflict matrix');
+        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
-        // Add data to the worksheet here
-
-        workbook.xlsx.writeBuffer().then((buffer) => {
-            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, 'input.xlsx');
-        });
-    }
-
+        const blob = new Blob([wbout], { type: 'application/octet-stream' });
+        saveAs(blob, 'input.xlsx');
+    };
 
     const handleDrop = (event) => {
         event.preventDefault();
         setExcelFile(event.dataTransfer.files[0]);
         event.target.classList.remove("dragging")
         //TODO: handle file validation
-        // if (excelFile) {
-        //     const extension = excelFile.name.split(".").pop();
-        //     console.log(extension);
-        // }
-        navigate('/input-processing');
+
 
     }
 
@@ -240,7 +356,8 @@ export default function InputPage() {
                 <p>Get Excel Template</p>
                 <img src={ExcelImage} alt="" />
             </div>
-            <div className="drag-area"
+            {excelFileError && <p className='file-error'>{excelFileError}</p>}
+            <div className={excelFileError ? 'drag-area file-error' : 'drag-area'}
                 onDrop={handleDrop}
                 onDragEnter={handleOnDragEnter}
                 onDragLeave={handleOnDragLeave}
@@ -248,7 +365,7 @@ export default function InputPage() {
             >
                 <p className='drag-text'>{excelFile ? excelFile.name : 'Drag and drop a file here'}</p>
                 <label htmlFor="select-file" id='select-file-label'>Choose a file</label>
-                <input type="file" id="select-file" handleOnChange={handleFileInput} />
+                <input type="file" id="select-file" onChange={handleFileInput} />
             </div>
         </div>
     )

@@ -78,6 +78,7 @@
             font-size: 12px;
             color: #00000095;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         #select-file-label {
@@ -106,4 +107,8 @@
         background: var(--grey)
     }
 
+    .file-error {
+        color: rgb(240, 66, 66);
+        font-size: 12px;
+    }
 }
