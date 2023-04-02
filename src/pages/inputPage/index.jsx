@@ -100,36 +100,32 @@ export default function InputPage() {
                     console.log("weights", weights);
 
                     const normalPlayerSheet = workbook.SheetNames[2];
-                    console.log("normal player sheet", normalPlayerSheet);
                     const worksheet2 = workbook.Sheets[normalPlayerSheet];
                     const players = [];
                     let currentPlayer = 0;
                     let currentRow = 1;
 
                     while (players.length < normalPlayerNum) {
-                        console.log("current row", currentRow);
                         const playerNameCell = worksheet2[`A${currentRow}`];
                         
                         const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
-                        console.log("player name", playerName);
                         const strategyNumber = worksheet2[`B${currentRow}`].v;
-                        console.log("strategy number", strategyNumber);
 
                         const strategies = [];
 
                         //LOAD STRATEGIES
                         for (let i = 1; i <= strategyNumber; i++) {
+                            // currentRow + i because the current row is the player name and the strategy number
                             const strategyNameCell = worksheet2[`A${currentRow + i}`];
                             
                             const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
-                            console.log("strategy name", strategyName);
                             const properties = []
 
                             //LOAD PROPERTIES
-                            for (let j = 0; j < normalPlayerPropsNum; j++) {
-                                const propertyCell = worksheet2[XLSX.utils.encode_cell({ c: j + 1, r: currentRow + i - 1} )]; // first column is the strategy name,
-                            
-                                console.log("property cell: ", propertyCell);
+                            for (let j = 1; j <= normalPlayerPropsNum; j++) {
+                                // c (0-based): j starts from 1 because the first column is the strategy name
+                                // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
+                                const propertyCell = worksheet2[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1} )]; 
                                 properties.push(propertyCell.v)
                             }
 
@@ -140,8 +136,9 @@ export default function InputPage() {
 
                         }
 
-                        
-                        currentRow += strategyNumber + 1;
+                        // currentRow + strategyNumber is the row of the last strategy,
+                        // and plus 1 because the next row is the player name
+                        currentRow += strategyNumber + 1; 
 
 
                         players.push({
@@ -149,7 +146,6 @@ export default function InputPage() {
                             strategies: strategies
                         })
                     }
-                    console.log("players", players);
                 }
     
             };
