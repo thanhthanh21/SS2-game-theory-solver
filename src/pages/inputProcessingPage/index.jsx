@@ -169,7 +169,6 @@ export default function InputProcessingPage() {
                     <div key={index}>
                         <Player name={player.name} strategies={player.strategies} />
                     </div>
-
                 ))}
             </div>
         </div>
