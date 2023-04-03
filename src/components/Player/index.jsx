@@ -7,14 +7,16 @@ export default function Player({ name, strategies }) {
   const toggleShowMore = () => {
     setShowMore(!showMore)
   }
-  
+
   return (
     <div className="contend">
-      <p className="name1">{name}</p>
-      <p className="name1">{strategies.length}  Strategies</p>
-      <label >
+      <div className="name1">
+        <p className="comp nameComp">{name}</p>
+        <p className="comp strategyComp">{strategies.length} Strategies</p>
+        <label className="comp">
         <span className={showMore ? 'fas fa-caret-up' : 'fas fa-caret-down'} onClick={toggleShowMore}></span>
-      </label>
+      </label>  
+      </div>
       {showMore && <div className="menubar">
         <ul>
           {strategies.map((strategy, index) => (
@@ -23,6 +25,7 @@ export default function Player({ name, strategies }) {
         </ul>
 
       </div>}
+
 
     </div>
   )

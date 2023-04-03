@@ -1,11 +1,11 @@
-
-.playerNum{
+.playerNum {
     font-size: 15px;
     color: #000;
     width: fit-content;
-    margin-right: auto ;
+    margin-right: auto;
     margin-left: auto;
-    margin-top: 50px; ;
+    margin-top: 50px;
+    ;
     padding: 0 10px;
     display: block;
 }
@@ -19,55 +19,84 @@
 //     border-radius: 20px;
 // }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
     width: 10px;
-    
+
 }
-::-webkit-scrollbar-thumb{
+
+::-webkit-scrollbar-thumb {
     background-color: #000;
     border-radius: 10px;
 }
-.input-processing-page label{
+
+.input-processing-page label {
     cursor: pointer;
 }
-.inputs{
-   display: none;
+
+.inputs {
+    display: none;
 }
 
-[id^=btn]:checked + .menubar{
-    display:block;
-}
-.menubar ul li{
+.menubar ul li {
     size: 50px;
     margin-left: 100px;
     margin-right: 100px;
     margin-top: 20px;
-    background-color: aquamarine;
+    background-color: rgb(211, 206, 206);
     padding: 10px;
     border-radius: 20px;
     // display:none; 
 }
-.contend{
+
+.contend {
     display: block;
     margin-right: 10px;
     margin-left: 10px;
-    background-color: rgb(203, 222, 229);
-    margin-top: 20px;
-    padding-top: 10px;
-    padding-bottom: 20px;
-    border-radius: 20px ;
+    background-color: rgb(230, 233, 233);
+    margin-top: 10px;
+    // padding-top: 5px;
+    // padding-bottom: 5px;
+    padding: 0 10px 0 20px;
+    border-radius: 20px;
+    position: relative;
+
+
 }
-.name1{
-display: inline;
-margin: 20px;
-margin-top: 100px;
+
+.name1 {
+    display: flex;
+    justify-content:stretch;
+    .comp {
+        text-align: center;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .nameComp {
+        width: 90px;
+    }
+
+    // .strategyComp {
+    //     position: absolute;
+    //     top: 10px;
+    //     left: 80px;
+    // }
 }
-.scrollBar{
+
+.scrollBar {
     background-color: white;
-    margin-left: 300px;
-    margin-right: 300px;
+    // margin-left: 300px;
+    // margin-right: 300px;
+    width: 700px;
+    margin: auto;
     padding-bottom: 50px;
     height: 300px;
     overflow-y: scroll;
 }
 
+@media screen and (max-width: 400px) {
+    .scrollBar {
+        width: 300px;
+    }
+}
