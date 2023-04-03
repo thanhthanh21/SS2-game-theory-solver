@@ -5,11 +5,15 @@ import GuidePage from "./pages/guidePage";
 import OutputPage from "./pages/outputPage";
 import "./App.scss";
 import {Routes, Route, useNavigate} from 'react-router-dom'
-
+import { createContext, useState } from "react";
+import DataContext from "./context/DataContext";
 //TODO: guide page
 //TODO: style the pages
 function App() {
+  const [data, setData] = useState(null)
+
   return (
+    <DataContext.Provider value={{data, setData}}>
     <div className="App">
       <Navbar />
       <Routes>
@@ -21,6 +25,7 @@ function App() {
         <Route path="*" element={<InputPage />} />
       </Routes>
     </div>
+    </DataContext.Provider>
   );
 }
 

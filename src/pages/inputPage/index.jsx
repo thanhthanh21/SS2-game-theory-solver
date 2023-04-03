@@ -6,6 +6,10 @@ import Input from "../../components/input";
 import ExcelImage from '../../images/excel.png'
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import { useContext } from 'react';
+import DataContext from "../../context/DataContext"
+
+
 /* load 'fs' for readFile and writeFile support */
 // import * as fs from 'fs';
 // XLSX.set_fs(fs);
@@ -35,13 +39,10 @@ export default function InputPage() {
 
     const [excelFileError, setExcelFileError] = useState('');
 
-    const [data, setData] = useState(null)
-
+    const { data, setData }= useContext(DataContext)
+    console.log(data);
 
     const navigate = useNavigate();
-    // useEffect(() => {
-    //     console.log("file", excelFile);
-    // }, [excelFile]);
 
     useEffect(() => {
         if (excelFile) {
@@ -58,104 +59,149 @@ export default function InputPage() {
         }
     }, [excelFile])
 
-    const readExcelFile = (file) => {
+    const readExcelFile = async (file) => {
         const reader = new FileReader();
         try {
             reader.onload = (e) => {
-                const data = e.target.result;
-                const workbook = XLSX.read(data, { type: 'binary' });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-    
-                const problemName = worksheet["B1"].v
-                const specialPlayerExists = worksheet["B2"].v
-                const specialPlayerPropsNum = worksheet["B3"].v
-                const normalPlayerNum = worksheet["B4"].v
-                const normalPlayerPropsNum = worksheet["B5"].v
-                const fitnessFunction = worksheet["B6"].v
-                const playerPayoffFunction = worksheet["B7"].v
-    
-                setProblemName(problemName);
-                setSpecialPlayerExists(specialPlayerExists);
-                setSpecialPlayerPropsNum(specialPlayerPropsNum);
-                setNormalPlayerNum(normalPlayerNum);
-                setNormalPlayerPropsNum(normalPlayerPropsNum);
-                setFitnessFunction(fitnessFunction);
-                setPlayerPayoffFunction(playerPayoffFunction);
-    
-                
-                if (specialPlayerExists) {
-                    const specialPlayerSheet = workbook.SheetNames[1];
-                    const worksheet = workbook.Sheets[specialPlayerSheet];
-                    const properties = []
-                    const weights = []
+                const excelData = e.target.result;
+                const workbook = XLSX.read(excelData, { type: 'binary' });
 
-                    for (let i = 1; i <= specialPlayerPropsNum; i++) {
-                        // the first row is the header
-                        properties.push(worksheet[`A${i+1}`].v)
-                        weights.push(worksheet[`B${i+1}`].v)
-                    }
-                    
-                    console.log("properties", properties);
-                    console.log("weights", weights);
+                const problemInfo = loadProblemInfo(workbook, 0);
+                console.log(problemInfo);
+                let specialPlayers = null
+                let players = null
 
-                    const normalPlayerSheet = workbook.SheetNames[2];
-                    const worksheet2 = workbook.Sheets[normalPlayerSheet];
-                    const players = [];
-                    let currentPlayer = 0;
-                    let currentRow = 1;
-
-                    while (players.length < normalPlayerNum) {
-                        const playerNameCell = worksheet2[`A${currentRow}`];
-                        
-                        const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
-                        const strategyNumber = worksheet2[`B${currentRow}`].v;
-
-                        const strategies = [];
-
-                        //LOAD STRATEGIES
-                        for (let i = 1; i <= strategyNumber; i++) {
-                            // currentRow + i because the current row is the player name and the strategy number
-                            const strategyNameCell = worksheet2[`A${currentRow + i}`];
-                            
-                            const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
-                            const properties = []
-
-                            //LOAD PROPERTIES
-                            for (let j = 1; j <= normalPlayerPropsNum; j++) {
-                                // c (0-based): j starts from 1 because the first column is the strategy name
-                                // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
-                                const propertyCell = worksheet2[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1} )]; 
-                                properties.push(propertyCell.v)
-                            }
-
-                            strategies.push({
-                                name: strategyName,
-                                properties: properties
-                            })
-
-                        }
-
-                        // currentRow + strategyNumber is the row of the last strategy,
-                        // and plus 1 because the next row is the player name
-                        currentRow += strategyNumber + 1; 
-
-
-                        players.push({
-                            name: playerName,
-                            strategies: strategies
-                        })
-                    }
+                console.log(specialPlayerExists);
+                if (problemInfo.specialPlayerExists) {
+                    specialPlayers = loadSpecialPlayer(workbook, 1) // sheet 1 is the special player sheet
+                    players = loadNormalPlayers(workbook, 2, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 2 is the normal player sheet
+                } else {
+                    players = loadNormalPlayers(workbook, 1, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 1 is the normal player sheet because there is no special player sheet
                 }
+
+                setData({
+                    problem: {
+                        name: problemInfo.problemName,
+                        specialPlayerExists: problemInfo.specialPlayerExists,
+                        specialPlayerPropsNum: problemInfo.specialPlayerPropsNum,
+                        normalPlayerNum: problemInfo.normalPlayerNum,
+                        normalPlayerPropsNum: problemInfo.normalPlayerPropsNum,
+                        fitnessFunction: problemInfo.fitnessFunction,
+                        playerPayoffFunction: problemInfo.playerPayoffFunction,
+                        specialPlayer: specialPlayers,
+                        players: players
+                    },
     
+                })
+                navigate('/input-processing')
+
             };
             reader.readAsBinaryString(file);
+
+
         } catch (error) {
             console.log(error);
             setExcelFileError("Error when reading file");
         }
     };
 
+    const loadProblemInfo = (workbook, sheetNumber) => {
+        const sheetName = workbook.SheetNames[sheetNumber];
+        const problemInfoWorksheet = workbook.Sheets[sheetName];
+
+        const problemName = problemInfoWorksheet["B1"].v
+        const specialPlayerExists = problemInfoWorksheet["B2"].v
+        const specialPlayerPropsNum = problemInfoWorksheet["B3"].v
+        const normalPlayerNum = problemInfoWorksheet["B4"].v
+        const normalPlayerPropsNum = problemInfoWorksheet["B5"].v
+        const fitnessFunction = problemInfoWorksheet["B6"].v
+        const playerPayoffFunction = problemInfoWorksheet["B7"].v
+
+        return {
+            problemName,
+            specialPlayerExists,
+            specialPlayerPropsNum,
+            normalPlayerNum,
+            normalPlayerPropsNum,
+            fitnessFunction,
+            playerPayoffFunction
+        }
+    }
+
+    const loadSpecialPlayer = (workbook, sheetNumber) => {
+        const sheetName = workbook.SheetNames[sheetNumber];
+        const specialPlayerWorkSheet = workbook.Sheets[sheetName];
+        const properties = []
+        const weights = []
+
+        // LOAD PROPERTIES AND WEIGHTS
+        for (let i = 1; i <= specialPlayerPropsNum; i++) {
+            //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
+            properties.push(specialPlayerWorkSheet[`A${i + 1}`].v)
+            weights.push(specialPlayerWorkSheet[`B${i + 1}`].v)
+        }
+        return {
+            properties,
+            weights
+        }
+    }
+
+
+
+    const loadNormalPlayers = (workbook, sheetNumber, normalPlayerNum, normalPlayerPropsNum) => {
+
+        const sheetName = workbook.SheetNames[sheetNumber];
+        console.log(sheetName);
+        const normalPlayerWorkSheet = workbook.Sheets[sheetName];
+        const players = [];
+        let currentPlayer = 0;
+        let currentRow = 1;
+
+        // LOAD PLAYERS
+        while (players.length < normalPlayerNum) {
+            const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
+
+            const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
+            const strategyNumber = normalPlayerWorkSheet[`B${currentRow}`].v;
+
+            const strategies = [];
+
+            // LOAD STRATEGIES
+            for (let i = 1; i <= strategyNumber; i++) {
+                // currentRow + i because the current row is the player name and the strategy number
+                const strategyNameCell = normalPlayerWorkSheet[`A${currentRow + i}`];
+
+                const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
+                const properties = []
+
+                // LOAD PROPERTIES
+                for (let j = 1; j <= normalPlayerPropsNum; j++) {
+                    // c (0-based): j starts from 1 because the first column is the strategy name
+                    // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
+                    const propertyCell = normalPlayerWorkSheet[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })];
+                    properties.push(propertyCell.v)
+                }
+
+                strategies.push({
+                    name: strategyName,
+                    properties: properties
+                })
+
+            }
+
+            // currentRow + strategyNumber is the row of the last strategy,
+            // and plus 1 because the next row is the player name
+            currentRow += strategyNumber + 1;
+
+
+            players.push({
+                name: playerName,
+                strategies: strategies
+            })
+        }
+
+        return players
+    }
     const handleGetExcelTemplate = () => {
         if (validateForm()) {
             downloadExcel();

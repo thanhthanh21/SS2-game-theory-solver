@@ -1,26 +1,4 @@
 
-.Problem{
-    font-size: 15px;
-    color: #000;
-    border-bottom: 1px solid black;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0 10px;
-    display: block;
-}
-.click{
-    font-size: 15px;
-    border-radius: 10px;
-    background-color: black;
-    color: white;
-    width: fit-content;
-    margin-right: auto ;
-    margin-left: auto;
-    margin-top: 50px; ;
-    padding: 0 10px;
-    display: block;
-    cursor: pointer;
-}
 .playerNum{
     font-size: 15px;
     color: #000;
@@ -40,12 +18,6 @@
 //     padding: 10px;
 //     border-radius: 20px;
 // }
-[id^=btn]:checked + .menubar li {
-    display:block;
-}
-.input-processing-page label{
-    cursor: pointer;
-}
 
 ::-webkit-scrollbar{
     width: 10px;
@@ -55,16 +27,47 @@
     background-color: #000;
     border-radius: 10px;
 }
-.menubar  li{
-    size:50px;
+.input-processing-page label{
+    cursor: pointer;
+}
+.inputs{
+   display: none;
+}
+
+[id^=btn]:checked + .menubar{
+    display:block;
+}
+.menubar ul li{
+    size: 50px;
     margin-left: 100px;
     margin-right: 100px;
     margin-top: 20px;
     background-color: aquamarine;
     padding: 10px;
     border-radius: 20px;
-    display:block; 
+    // display:none; 
+}
+.contend{
+    display: block;
+    margin-right: 10px;
+    margin-left: 10px;
+    background-color: rgb(203, 222, 229);
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    border-radius: 20px ;
+}
+.name1{
+display: inline;
+margin: 20px;
+margin-top: 100px;
+}
+.scrollBar{
+    background-color: white;
+    margin-left: 300px;
+    margin-right: 300px;
+    padding-bottom: 50px;
+    height: 300px;
+    overflow-y: scroll;
 }
 
-
-    
