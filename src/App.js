@@ -11,9 +11,9 @@ import DataContext from "./context/DataContext";
 //TODO: style the pages
 function App() {
   const [data, setData] = useState(null)
-
+  const [guideSectionIndex, setGuideSectionIndex] = useState(0)
   return (
-    <DataContext.Provider value={{data, setData}}>
+    <DataContext.Provider value={{data, setData, guideSectionIndex, setGuideSectionIndex}}>
     <div className="App">
       <Navbar />
       <Routes>

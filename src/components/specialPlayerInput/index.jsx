@@ -23,6 +23,9 @@ export default function SpecialPlayerInput({ specialPlayerExists, setSpecialPlay
             setStyle('hidden');
         }
     }, [specialPlayerExists]);
+
+
+  
     return (
         <div className={`special-player-input`}>
             <label htmlFor="special-player-checkbox" className='special-player-label'>
@@ -30,23 +33,25 @@ export default function SpecialPlayerInput({ specialPlayerExists, setSpecialPlay
                     type="checkbox"
                     placeholder="You problem name"
                     id="special-player-checkbox"
-                    onChange={e => setSpecialPlayerExists(e.target.checked)} 
+                    onChange={e => setSpecialPlayerExists(e.target.checked)}
                     value={specialPlayerExists}
-                    
+
                 />
                 <p>Special player exists</p>
             </label>
 
             <div className={`${style}`} onAnimationEnd={handleHidingAnimationEnd}>
-                <Input 
-                    message="Number of properties of special player" 
+                <Input
+                    message="Number of properties of special player"
                     type='number'
                     error={error}
                     handleOnChange={(e) => {
                         console.log("e.target.value", e.target.value);
-                        setSpecialPlayerPropsNum(e.target.value)}}
+                        setSpecialPlayerPropsNum(e.target.value)
+                    }}
                     value={specialPlayerPropsNum}
-                    description=""
+                    description="Positive integer value that corresponds to the number of properties that the special player has."
+                    guideSectionIndex={3}
                 />
             </div>
 

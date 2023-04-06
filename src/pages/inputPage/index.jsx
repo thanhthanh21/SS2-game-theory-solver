@@ -39,7 +39,7 @@ export default function InputPage() {
 
     const [excelFileError, setExcelFileError] = useState('');
 
-    const { data, setData }= useContext(DataContext)
+    const { data, setData, setGuideSectionIndex }= useContext(DataContext)
     console.log(data);
 
     const navigate = useNavigate();
@@ -340,7 +340,8 @@ export default function InputPage() {
                         error={problemNameError}
                         handleOnChange={(e) => setProblemName(e.target.value)}
                         value={problemName}
-                        descrition=""
+                        description="The name should be concise and meaningful, reflecting the nature of the game being analyzed"
+                        guideSectionIndex={1}
                     />
                 </div>
                 <div className="row">
@@ -360,7 +361,9 @@ export default function InputPage() {
                         error={normalPlayerNumError}
                         handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
                         value={normalPlayerNum}
-                        descrition=""
+                        description="A positive number that reflects the number of players involved to ensure that the resulting Nash equilibrium is valid"
+                        guideSectionIndex={4}
+
                     />
                     <Input
                         message='Number of properties each strategy of normal player'
@@ -368,7 +371,8 @@ export default function InputPage() {
                         error={normalPlayerPropsNumError}
                         handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
                         value={normalPlayerPropsNum}
-                        descrition=""
+                        description="A property is a characteristic or attribute that a player has that affects their actions or outcomes in the game"
+                        guideSectionIndex={5}
                     />
                 </div>
 
@@ -379,7 +383,8 @@ export default function InputPage() {
                         error={fitnessFunctionError}
                         handleOnChange={(e) => setFitnessFunction(e.target.value)}
                         value={fitnessFunction}
-                        descrition=""
+                        description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
+                        guideSectionIndex={6}
                     />
                 </div>
 
@@ -390,7 +395,8 @@ export default function InputPage() {
                         error={playerPayoffFunctionError}
                         handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
                         value={playerPayoffFunction}
-                        descrition=""
+                        description="The player payoff function is a mathematical function that determines the outcome of the game by assigning a payoff value to each player based on the strategies chosen by all the players in the game"
+                        guideSectionIndex={7}
                     />
                 </div>
             </div>

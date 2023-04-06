@@ -35,6 +35,11 @@
         .highlight {
             color: white;
             background: black;
+
+            &:hover {
+                background: black;
+                color: white;
+            }
         }
     }
 
@@ -49,7 +54,23 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-
+            
+            .gray-board {
+                background: #f0f0f0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                // width: 100%;
+                height: 400px;
+                // padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #e5e5e5;
+                
+                p {
+                    text-align: center;     
+                }
+            }
         }
+
     }
 }

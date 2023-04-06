@@ -2,8 +2,8 @@ import React from 'react';
 import ErrorText from '../ErrorText';
 import InputHint from '../InputHint';
 import "./style.scss";
-import { useState } from 'react';
-export default function Input({ type, message, error, handleOnChange, value, description }) {
+import { useState, useContext } from 'react';
+export default function Input({ type, message, error, handleOnChange, value, description,guideSectionIndex }) {
     // const playerHolder = error ? message: message;
     const style = error ? "error" : "";
     const [showHint, setShowHint] = useState(false);
@@ -19,7 +19,7 @@ export default function Input({ type, message, error, handleOnChange, value, des
                 }
 
                 <i className="info fa-solid fa-info" onMouseOver={handleMouseOver}></i>
-                <InputHint showHint={showHint} setShowHint={setShowHint} heading={message}/>
+                <InputHint showHint={showHint} setShowHint={setShowHint} heading={message} guideSectionIndex={guideSectionIndex} description={description}/>
 
             </div>
 
