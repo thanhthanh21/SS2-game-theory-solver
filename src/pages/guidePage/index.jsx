@@ -32,8 +32,8 @@ export default function GuidePage() {
 
         const options = {
             root: null,
-            rootMargin: '10px',
-            threshold: 0.9
+            rootMargin: '150px',
+            threshold: 1
         };
 
         const observer = new IntersectionObserver(entries => {
@@ -58,12 +58,17 @@ export default function GuidePage() {
     }, []);
 
 
+    useEffect(() => {
+        const ref = refArray[guideSectionIndex]
+        scrollTo(ref)
+    }, [])
+    
     function scrollTo(sectionRef) {
         const index = refArray.indexOf(sectionRef)
         setGuideSectionIndex(index)
         sectionRef.current.scrollIntoView(
             {
-                behavior: 'smooth',
+                behavior: 'instant',
                 block: 'start'
             }
         )
