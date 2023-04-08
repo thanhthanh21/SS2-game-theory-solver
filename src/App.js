@@ -7,6 +7,7 @@ import "./App.scss";
 import {Routes, Route, useNavigate} from 'react-router-dom'
 import { createContext, useState } from "react";
 import DataContext from "./context/DataContext";
+import InsightPage from "./pages/insightPage";
 //TODO: guide page
 //TODO: style the pages
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/guide" element={<GuidePage />} />
         <Route path="/input-processing" element={<InputProcessingPage />} />
         <Route path="/result" element={<OutputPage />} />
+        <Route path='/insights' element={<InsightPage />} />
         <Route path="*" element={<InputPage />} />
       </Routes>
     </div>

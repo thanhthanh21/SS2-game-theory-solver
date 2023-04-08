@@ -13,7 +13,7 @@ export default function NothingToShow() {
         <div className='nothing-to-show'>
             <p>Nothing to show here</p>
             <img src="https://iogames.onl/themes/iogames/rs/images/io-games.png" alt="" />
-            <button class='btn' onClick={navigateToHome}>Back to homepage</button>
+            <button className='btn' onClick={navigateToHome}>Back to homepage</button>
         </div>
     );
 }
