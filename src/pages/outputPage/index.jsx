@@ -3,74 +3,26 @@ import "./style.scss"
 import PlayerResult from '../../components/PlayerResult'
 import ExcelImage from '../../images/excel.png'
 import GraphImage from '../../images/graph1.png'
-
+import { useContext, useEffect } from 'react'
+import DataContext from "../../context/DataContext"
+import { useNavigate } from 'react-router-dom';
+import NothingToShow from '../../components/NothingToShow';
 export default function OutputPage() {
-  const players = [
-    {
-      idex: 1,
-      name: "Player 1",
-      choosenStrategy: "Strategy 3",
-      payoffValue: 0.20028350308120002
-    },
-    {
-      idex: 2,
-      name: "Player 2",
-      choosenStrategy: "Strategy 2",
-      payoffValue: 0.44126170431689626
-    },
-    {
-      idex: 3,
-      name: "Player 3",
-      choosenStrategy: "Strategy 5",
-      payoffValue: 0.8663174343245001
-    },
-    {
-      idex: 4,
-      name: "Player 4",
-      choosenStrategy: "Strategy 1",
-      payoffValue: 0.9092766191717305
-    },
-    {
-      idex: 5,
-      name: "Player 5",
-      choosenStrategy: "Strategy 1",
-      payoffValue: 0.8671769111013774
-    },
-    {
-      idex: 6,
-      name: "Player 6",
-      choosenStrategy: "Strategy 2",
-      payoffValue: 0.0685257356799478
-    },
-    {
-      idex: 7,
-      name: "Player 7",
-      choosenStrategy: "Strategy 2",
-      payoffValue: 0.32624460862736093
-    },
-    {
-      idex: 8,
-      name: "Player 8",
-      choosenStrategy: "Strategy 4",
-      payoffValue: 0.07888482214902304
-    },
-    {
-      idex: 9,
-      name: "Player 9",
-      choosenStrategy: "Strategy 2",
-      payoffValue: 0.6083824549909775
-    },
-    {
-      idex: 10,
-      name: "Player 10",
-      choosenStrategy: "Strategy 3",
-      payoffValue: 0.006841291194771726
-    }
-  ];
-
+  const navigate = useNavigate();
+  const { data, setData } = useContext(DataContext)
+  const navigateToHome = () => {
+    setData(null)
+    navigate('/')
+  }
+  if (data == null) {
+    return (
+      <NothingToShow />
+    )
+  }
+  
   return (
     <div className='output-page'>
-      <p className='header-text'>Oil Price Problem</p>
+      <p className='header-text'>{ data.problem.name }</p>
       <br />
       <p className='below-headertext'> Optimal solution</p>
       <div className="output-container">
@@ -86,7 +38,7 @@ export default function OutputPage() {
         </div>
       </div>
       <br />
-      <p className='below-headertext'> Fitness value: 15821810.1241</p>
+      <p className='below-headertext'> Fitness value: { data.result.fitnessValue}</p>
       <br />
 
       <div className="table-container">
@@ -97,7 +49,7 @@ export default function OutputPage() {
           <div className="column head-column">Payoff value</div>
         </div>
 
-        {players.map((player, index) => (
+        {data.result.players?.map((player, index) => (
           <PlayerResult key={index} player={player} index={index + 1} />
         ))}
       </div>

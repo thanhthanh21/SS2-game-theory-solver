@@ -1,12 +1,12 @@
 .output-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
 
 
-.header-text {
+  .header-text {
     font-size: 16px;
     // font-weight: 600;
     color: #000;
@@ -16,109 +16,114 @@
     padding: 0 10px 10px 10px;
     width: 300px;
     text-align: center;
-}
-.below-headertext{
+  }
+
+  .below-headertext {
     font-size: 14px;
     // font-weight: 600;
     color: #000;
     width: fit-content;
     margin: 0 auto;
     padding: 0 10px;
-}
-.output-container {
+  }
+
+  .output-container {
     margin: 20px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
-}
-.row {
+  }
+
+  .row {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
 
-}
-.grid-container {
+  }
+
+  .grid-container {
     display: grid;
-    grid-template-columns: 1fr 6fr 8fr 2fr; /* The first column is half the width of the others */
+    grid-template-columns: 1fr 6fr 8fr 2fr;
+    /* The first column is half the width of the others */
     font-weight: bolder;
   }
 
   .column {
     padding: 10px;
   }
-  
-/* For screen sizes less than or equal to 768px */
-@media only screen and (max-width: 768px) {
+
+  /* For screen sizes less than or equal to 768px */
+  @media only screen and (max-width: 768px) {
     .output-page {
       padding: 0 10px;
     }
-  
+
     .header-text {
       font-size: 14px;
       width: 100%;
       padding: 0 5px 5px 5px;
       margin: 0;
     }
-  
+
     .below-headertext {
       font-size: 12px;
       padding: 0 5px;
     }
-  
+
     .row {
       flex-wrap: wrap;
       justify-content: center;
     }
-  
+
     .grid-container {
       grid-template-columns: 1fr 3fr 4fr 1fr;
     }
-  
+
     .grid-item-container {
       grid-template-columns: 1fr 4fr 4fr 1fr;
       margin-top: 5px;
       padding: 0 10px;
     }
   }
-  
+
   /* For screen sizes greater than 768px */
   @media only screen and (min-width: 769px) {
     .output-page {
       padding: 0 30px;
     }
-  
+
     .header-text {
       font-size: 16px;
       width: fit-content;
       padding: 0 10px 10px 10px;
       margin: 0 auto;
     }
-  
+
     .below-headertext {
       font-size: 14px;
       padding: 0 10px;
     }
-  
+
     .row {
       justify-content: center;
     }
-  
+
     .grid-container {
       grid-template-columns: 1fr 6fr 8fr 2fr;
     }
-  
+
     .grid-item-container {
       margin-top: 10px;
       padding: 0 20px;
-  
+
       .player-name {
         font-weight: 700;
         color: #000;
       }
     }
   }
-  
+
 }

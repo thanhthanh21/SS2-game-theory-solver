@@ -9,13 +9,8 @@ import * as XLSX from 'xlsx';
 import { useContext } from 'react';
 import DataContext from "../../context/DataContext"
 
-
-/* load 'fs' for readFile and writeFile support */
-// import * as fs from 'fs';
-// XLSX.set_fs(fs);
-// // impor
-
 import { useNavigate } from 'react-router';
+import Loading from '../../components/Loading';
 
 export default function InputPage() {
     const [excelFile, setExcelFile] = useState(null);
@@ -35,11 +30,11 @@ export default function InputPage() {
     const [normalPlayerPropsNumError, setNormalPlayerPropsNumError] = useState("");
     const [fitnessFunctionError, setFitnessFunctionError] = useState("");
     const [playerPayoffFunctionError, setPlayerPayoffFunctionError] = useState("");
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const [excelFileError, setExcelFileError] = useState('');
 
-    const { data, setData, setGuideSectionIndex }= useContext(DataContext)
+    const { data, setData, setGuideSectionIndex } = useContext(DataContext)
     console.log(data);
 
     const navigate = useNavigate();
@@ -63,6 +58,7 @@ export default function InputPage() {
         const reader = new FileReader();
         try {
             reader.onload = (e) => {
+                setIsLoading(true)
                 const excelData = e.target.result;
                 const workbook = XLSX.read(excelData, { type: 'binary' });
 
@@ -91,8 +87,9 @@ export default function InputPage() {
                         specialPlayer: specialPlayers,
                         players: players
                     },
-    
                 })
+                
+                setIsLoading(false)
                 navigate('/input-processing')
 
             };
@@ -106,102 +103,112 @@ export default function InputPage() {
     };
 
     const loadProblemInfo = (workbook, sheetNumber) => {
-        const sheetName = workbook.SheetNames[sheetNumber];
-        const problemInfoWorksheet = workbook.Sheets[sheetName];
+        try {
+            const sheetName = workbook.SheetNames[sheetNumber];
+            const problemInfoWorksheet = workbook.Sheets[sheetName];
 
-        const problemName = problemInfoWorksheet["B1"].v
-        const specialPlayerExists = problemInfoWorksheet["B2"].v
-        const specialPlayerPropsNum = problemInfoWorksheet["B3"].v
-        const normalPlayerNum = problemInfoWorksheet["B4"].v
-        const normalPlayerPropsNum = problemInfoWorksheet["B5"].v
-        const fitnessFunction = problemInfoWorksheet["B6"].v
-        const playerPayoffFunction = problemInfoWorksheet["B7"].v
+            const problemName = problemInfoWorksheet["B1"].v
+            const specialPlayerExists = problemInfoWorksheet["B2"].v
+            const specialPlayerPropsNum = problemInfoWorksheet["B3"].v
+            const normalPlayerNum = problemInfoWorksheet["B4"].v
+            const normalPlayerPropsNum = problemInfoWorksheet["B5"].v
+            const fitnessFunction = problemInfoWorksheet["B6"].v
+            const playerPayoffFunction = problemInfoWorksheet["B7"].v
 
-        return {
-            problemName,
-            specialPlayerExists,
-            specialPlayerPropsNum,
-            normalPlayerNum,
-            normalPlayerPropsNum,
-            fitnessFunction,
-            playerPayoffFunction
+            return {
+                problemName,
+                specialPlayerExists,
+                specialPlayerPropsNum,
+                normalPlayerNum,
+                normalPlayerPropsNum,
+                fitnessFunction,
+                playerPayoffFunction
+            }
+        } catch (error) {
+            setExcelFileError("Error when reading file");
         }
     }
 
     const loadSpecialPlayer = (workbook, sheetNumber) => {
-        const sheetName = workbook.SheetNames[sheetNumber];
-        const specialPlayerWorkSheet = workbook.Sheets[sheetName];
-        const properties = []
-        const weights = []
+        try {
+            const sheetName = workbook.SheetNames[sheetNumber];
+            const specialPlayerWorkSheet = workbook.Sheets[sheetName];
+            const properties = []
+            const weights = []
 
-        // LOAD PROPERTIES AND WEIGHTS
-        for (let i = 1; i <= specialPlayerPropsNum; i++) {
-            //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
-            properties.push(specialPlayerWorkSheet[`A${i + 1}`].v)
-            weights.push(specialPlayerWorkSheet[`B${i + 1}`].v)
-        }
-        return {
-            properties,
-            weights
+            // LOAD PROPERTIES AND WEIGHTS
+            for (let i = 1; i <= specialPlayerPropsNum; i++) {
+                //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
+                properties.push(specialPlayerWorkSheet[`A${i + 1}`].v)
+                weights.push(specialPlayerWorkSheet[`B${i + 1}`].v)
+            }
+            return {
+                properties,
+                weights
+            }
+        } catch (error) {
+            setExcelFileError("Error when reading file");
         }
     }
-
-
 
     const loadNormalPlayers = (workbook, sheetNumber, normalPlayerNum, normalPlayerPropsNum) => {
+        try {
+            const sheetName = workbook.SheetNames[sheetNumber];
+            console.log(sheetName);
+            const normalPlayerWorkSheet = workbook.Sheets[sheetName];
+            const players = [];
+            let currentPlayer = 0;
+            let currentRow = 1;
 
-        const sheetName = workbook.SheetNames[sheetNumber];
-        console.log(sheetName);
-        const normalPlayerWorkSheet = workbook.Sheets[sheetName];
-        const players = [];
-        let currentPlayer = 0;
-        let currentRow = 1;
+            // LOAD PLAYERS
+            while (players.length < normalPlayerNum) {
+                const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
 
-        // LOAD PLAYERS
-        while (players.length < normalPlayerNum) {
-            const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
+                const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
+                const strategyNumber = normalPlayerWorkSheet[`B${currentRow}`].v;
 
-            const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
-            const strategyNumber = normalPlayerWorkSheet[`B${currentRow}`].v;
+                const strategies = [];
 
-            const strategies = [];
+                // LOAD STRATEGIES
+                for (let i = 1; i <= strategyNumber; i++) {
+                    // currentRow + i because the current row is the player name and the strategy number
+                    const strategyNameCell = normalPlayerWorkSheet[`A${currentRow + i}`];
 
-            // LOAD STRATEGIES
-            for (let i = 1; i <= strategyNumber; i++) {
-                // currentRow + i because the current row is the player name and the strategy number
-                const strategyNameCell = normalPlayerWorkSheet[`A${currentRow + i}`];
+                    const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
+                    const properties = []
 
-                const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
-                const properties = []
+                    // LOAD PROPERTIES
+                    for (let j = 1; j <= normalPlayerPropsNum; j++) {
+                        // c (0-based): j starts from 1 because the first column is the strategy name
+                        // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
+                        const propertyCell = normalPlayerWorkSheet[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })];
+                        properties.push(propertyCell.v)
+                    }
 
-                // LOAD PROPERTIES
-                for (let j = 1; j <= normalPlayerPropsNum; j++) {
-                    // c (0-based): j starts from 1 because the first column is the strategy name
-                    // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
-                    const propertyCell = normalPlayerWorkSheet[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })];
-                    properties.push(propertyCell.v)
+                    strategies.push({
+                        name: strategyName,
+                        properties: properties
+                    })
+
                 }
 
-                strategies.push({
-                    name: strategyName,
-                    properties: properties
-                })
+                // currentRow + strategyNumber is the row of the last strategy,
+                // and plus 1 because the next row is the player name
+                currentRow += strategyNumber + 1;
 
+
+                players.push({
+                    name: playerName,
+                    strategies: strategies
+                })
             }
 
-            // currentRow + strategyNumber is the row of the last strategy,
-            // and plus 1 because the next row is the player name
-            currentRow += strategyNumber + 1;
-
-
-            players.push({
-                name: playerName,
-                strategies: strategies
-            })
+            return players
+        } catch (error) {
+            setExcelFileError("Error when reading file");
         }
-
-        return players
     }
+
     const handleGetExcelTemplate = () => {
         if (validateForm()) {
             downloadExcel();
@@ -322,7 +329,6 @@ export default function InputPage() {
         event.target.classList.remove("dragging")
     }
 
-
     const handleFileInput = (event) => {
         setExcelFile(event.target.files[0]);
         console.log("file", excelFile);
@@ -331,6 +337,8 @@ export default function InputPage() {
 
     return (
         <div className="input-page">
+            <Loading isLoading={isLoading} />
+
             <p className='header-text'>Enter information about your problem</p>
             <div className="input-container">
                 <div className="row">

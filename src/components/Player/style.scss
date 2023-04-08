@@ -1,7 +1,8 @@
+
 .playerNum {
     font-size: 15px;
     color: #000;
-    width: fit-content;
+    width: 100%;
     margin-right: auto;
     margin-left: auto;
     margin-top: 50px;
@@ -10,14 +11,6 @@
     display: block;
 }
 
-// .divcon{
-//     margin-left: 100px;
-//     margin-right: 100px;
-//     margin-top: 20px;
-//     background-color: aquamarine;
-//     padding: 10px;
-//     border-radius: 20px;
-// }
 
 ::-webkit-scrollbar {
     width: 10px;
