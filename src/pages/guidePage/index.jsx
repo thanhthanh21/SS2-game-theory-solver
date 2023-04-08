@@ -106,10 +106,7 @@ export default function GuidePage() {
                 <section className='section' ref={problemNameRef} id='1'>
                     <h1>Name of the problem</h1>
                     <p>This section requires the user to provide a name for the problem they are trying to solve using the MOEA framework. The name should be concise and meaningful, reflecting the nature of the game being analyzed. For example, if the game is about two competing companies deciding whether to enter a new market, the name could be "Market Entry Game." Providing a name for the problem helps keep track of different games that are being analyzed and facilitates sharing and collaboration.</p>
-                    {/* <p></p>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam architecto eos vitae placeat ea non, inventore numquam atque error quidem facilis mollitia recusandae nesciunt, voluptatem facere itaque reprehenderit commodi modi magnam maiores, quisquam hic voluptates! Nostrum expedita ea praesentium a necessitatibus nesciunt non, similique esse numquam maxime voluptatem neque! Tempore!</p>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam architecto eos vitae placeat ea non, inventore numquam atque error quidem facilis mollitia recusandae nesciunt, voluptatem facere itaque reprehenderit commodi modi magnam maiores, quisquam hic voluptates! Nostrum expedita ea praesentium a necessitatibus nesciunt non, similique esse numquam maxime voluptatem neque! Tempore!</p>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam architecto eos vitae placeat ea non, inventore numquam atque error quidem facilis mollitia recusandae nesciunt, voluptatem facere itaque reprehenderit commodi modi magnam maiores, quisquam hic voluptates! Nostrum expedita ea praesentium a necessitatibus nesciunt non, similique esse numquam maxime voluptatem neque! Tempore!</p> */}
+        
                 </section>
                 <section className='section' ref={specialPlayerExistsRef} id="2">
                     <h1>Special Player exists.</h1>
