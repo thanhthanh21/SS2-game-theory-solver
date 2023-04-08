@@ -30,7 +30,7 @@ export default function InputProcessingPage() {
             defaultPayoffFunction: data.problem.playerPayoffFunction
         }
         setIsLoading(true);
-        const res = await axios.post('http://localhost:8080/api/game-theory-solver', body);
+        const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/game-theory-solver`, body);
         setData({ ...data, result: res.data.data });
         setIsLoading(false);
         navigate('/result')
