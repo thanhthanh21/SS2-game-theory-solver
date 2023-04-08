@@ -10,6 +10,8 @@ import { useContext } from 'react';
 import DataContext from "../../context/DataContext"
 
 import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom'
+
 import Loading from '../../components/Loading';
 
 export default function InputPage() {
@@ -88,7 +90,7 @@ export default function InputPage() {
                         players: players
                     },
                 })
-                
+
                 setIsLoading(false)
                 navigate('/input-processing')
 
@@ -338,7 +340,9 @@ export default function InputPage() {
     return (
         <div className="input-page">
             <Loading isLoading={isLoading} />
-
+            <div className="warning">
+                <p className="warning-text">⚠️ This is a beta version of the tool. Special player and conflict set are not supported yet. Please report any bugs to us on MS Teams</p>
+            </div>
             <p className='header-text'>Enter information about your problem</p>
             <div className="input-container">
                 <div className="row">
@@ -412,6 +416,14 @@ export default function InputPage() {
                 <p>Get Excel Template</p>
                 <img src={ExcelImage} alt="" />
             </div>
+
+            <div className="guide-box">
+                <p>Get the Excel file template, input your data, then drag & drop it to the box below</p>
+                <Link to='/guide' className='guide-link' onClick={e => setGuideSectionIndex(8)}> Learn more on how to input to file Excel</Link>
+
+            </div>
+
+
             {excelFileError && <p className='file-error'>{excelFileError}</p>}
             <div className={excelFileError ? 'drag-area file-error' : 'drag-area'}
                 onDrop={handleDrop}
