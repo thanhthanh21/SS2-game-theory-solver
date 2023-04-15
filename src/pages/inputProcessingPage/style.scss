@@ -8,6 +8,16 @@
     padding: 0 10px;
     display: block;
 }
+
+.input-processing-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    .algorithm-select {
+        margin: 0 auto;
+    }
+}
 .click{
     font-size: 15px;
     border-radius: 10px;
@@ -16,7 +26,7 @@
     width: fit-content;
     margin-right: auto ;
     margin-left: auto;
-    margin-top: 50px; ;
+    // margin-top: 50px; ;
     padding: 0 10px;
     display: block;
     cursor: pointer;
@@ -27,7 +37,7 @@
     width: fit-content;
     margin-right: auto ;
     margin-left: auto;
-    margin-top: 50px; ;
+    // margin-top: 50px; ;
     text-align: center;
     padding: 0 10px;
     display: block;

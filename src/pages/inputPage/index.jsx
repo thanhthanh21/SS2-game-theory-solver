@@ -37,18 +37,15 @@ export default function InputPage() {
     const [excelFileError, setExcelFileError] = useState('');
 
     const { data, setData, setGuideSectionIndex } = useContext(DataContext)
-    console.log(data);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         if (excelFile) {
             const extension = excelFile.name.split(".").pop();
-            console.log(extension);
 
             if (extension === "xlsx") {
                 setExcelFileError("");
-                console.log("file", excelFile);
                 const data = readExcelFile(excelFile);
             } else {
                 setExcelFileError("Not an Excel file");
@@ -59,24 +56,24 @@ export default function InputPage() {
     const readExcelFile = async (file) => {
         const reader = new FileReader();
         try {
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 setIsLoading(true)
                 const excelData = e.target.result;
                 const workbook = XLSX.read(excelData, { type: 'binary' });
 
-                const problemInfo = loadProblemInfo(workbook, 0);
-                console.log(problemInfo);
+                const problemInfo = await loadProblemInfo(workbook, 0);
                 let specialPlayers = null
                 let players = null
+                let conflictSet = null;
 
-                console.log(specialPlayerExists);
                 if (problemInfo.specialPlayerExists) {
-                    specialPlayers = loadSpecialPlayer(workbook, 1) // sheet 1 is the special player sheet
-                    players = loadNormalPlayers(workbook, 2, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 2 is the normal player sheet
+                    specialPlayers = await loadSpecialPlayer(workbook, 1) // sheet 1 is the special player sheet
+                    players = await loadNormalPlayers(workbook, 2, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 2 is the normal player sheet
+                    conflictSet = await loadConflictSet(workbook, 3) // sheet 3 is the conflict set sheet
                 } else {
-                    players = loadNormalPlayers(workbook, 1, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 1 is the normal player sheet because there is no special player sheet
+                    players = await loadNormalPlayers(workbook, 1, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 1 is the normal player sheet because there is no special player sheet
+                    conflictSet = await loadConflictSet(workbook, 2) // sheet 2 is the conflict set sheet
                 }
-
                 setData({
                     problem: {
                         name: problemInfo.problemName,
@@ -87,7 +84,8 @@ export default function InputPage() {
                         fitnessFunction: problemInfo.fitnessFunction,
                         playerPayoffFunction: problemInfo.playerPayoffFunction,
                         specialPlayer: specialPlayers,
-                        players: players
+                        players: players,
+                        conflictSet: conflictSet
                     },
                 })
 
@@ -99,23 +97,22 @@ export default function InputPage() {
 
 
         } catch (error) {
-            console.log(error);
             setExcelFileError("Error when reading file");
         }
     };
 
-    const loadProblemInfo = (workbook, sheetNumber) => {
+    const loadProblemInfo = async (workbook, sheetNumber) => {
         try {
-            const sheetName = workbook.SheetNames[sheetNumber];
-            const problemInfoWorksheet = workbook.Sheets[sheetName];
+            const sheetName = await workbook.SheetNames[sheetNumber];
+            const problemInfoWorksheet = await workbook.Sheets[sheetName];
 
-            const problemName = problemInfoWorksheet["B1"].v
-            const specialPlayerExists = problemInfoWorksheet["B2"].v
-            const specialPlayerPropsNum = problemInfoWorksheet["B3"].v
-            const normalPlayerNum = problemInfoWorksheet["B4"].v
-            const normalPlayerPropsNum = problemInfoWorksheet["B5"].v
-            const fitnessFunction = problemInfoWorksheet["B6"].v
-            const playerPayoffFunction = problemInfoWorksheet["B7"].v
+            const problemName = await problemInfoWorksheet["B1"].v
+            const specialPlayerExists = await problemInfoWorksheet["B2"].v
+            const specialPlayerPropsNum = await problemInfoWorksheet["B3"].v
+            const normalPlayerNum = await problemInfoWorksheet["B4"].v
+            const normalPlayerPropsNum = await problemInfoWorksheet["B5"].v
+            const fitnessFunction = await problemInfoWorksheet["B6"].v
+            const playerPayoffFunction = await problemInfoWorksheet["B7"].v
 
             return {
                 problemName,
@@ -131,18 +128,18 @@ export default function InputPage() {
         }
     }
 
-    const loadSpecialPlayer = (workbook, sheetNumber) => {
+    const loadSpecialPlayer = async (workbook, sheetNumber) => {
         try {
-            const sheetName = workbook.SheetNames[sheetNumber];
-            const specialPlayerWorkSheet = workbook.Sheets[sheetName];
+            const sheetName = await workbook.SheetNames[sheetNumber];
+            const specialPlayerWorkSheet = await workbook.Sheets[sheetName];
             const properties = []
             const weights = []
 
             // LOAD PROPERTIES AND WEIGHTS
             for (let i = 1; i <= specialPlayerPropsNum; i++) {
                 //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
-                properties.push(specialPlayerWorkSheet[`A${i + 1}`].v)
-                weights.push(specialPlayerWorkSheet[`B${i + 1}`].v)
+                properties.push(await specialPlayerWorkSheet[`A${i + 1}`].v)
+                weights.push(await specialPlayerWorkSheet[`B${i + 1}`].v)
             }
             return {
                 properties,
@@ -153,11 +150,10 @@ export default function InputPage() {
         }
     }
 
-    const loadNormalPlayers = (workbook, sheetNumber, normalPlayerNum, normalPlayerPropsNum) => {
+    const loadNormalPlayers = async (workbook, sheetNumber, normalPlayerNum, normalPlayerPropsNum) => {
         try {
-            const sheetName = workbook.SheetNames[sheetNumber];
-            console.log(sheetName);
-            const normalPlayerWorkSheet = workbook.Sheets[sheetName];
+            const sheetName = await workbook.SheetNames[sheetNumber];
+            const normalPlayerWorkSheet = await workbook.Sheets[sheetName];
             const players = [];
             let currentPlayer = 0;
             let currentRow = 1;
@@ -167,14 +163,14 @@ export default function InputPage() {
                 const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
 
                 const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
-                const strategyNumber = normalPlayerWorkSheet[`B${currentRow}`].v;
+                const strategyNumber = await normalPlayerWorkSheet[`B${currentRow}`].v;
 
                 const strategies = [];
 
                 // LOAD STRATEGIES
                 for (let i = 1; i <= strategyNumber; i++) {
                     // currentRow + i because the current row is the player name and the strategy number
-                    const strategyNameCell = normalPlayerWorkSheet[`A${currentRow + i}`];
+                    const strategyNameCell = await normalPlayerWorkSheet[`A${currentRow + i}`];
 
                     const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
                     const properties = []
@@ -183,7 +179,7 @@ export default function InputPage() {
                     for (let j = 1; j <= normalPlayerPropsNum; j++) {
                         // c (0-based): j starts from 1 because the first column is the strategy name
                         // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
-                        const propertyCell = normalPlayerWorkSheet[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })];
+                        const propertyCell = await normalPlayerWorkSheet[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })];
                         properties.push(propertyCell.v)
                     }
 
@@ -211,6 +207,43 @@ export default function InputPage() {
         }
     }
 
+    const loadConflictSet = async (workbook, sheetNumber) => {
+        try {
+            const sheetName = workbook.SheetNames[sheetNumber];
+            const conflictSetWorkSheet = workbook.Sheets[sheetName];
+            const conflictSet = [];
+            let row = 0;
+            let col = 0;
+            let currentCell = await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
+
+            while (currentCell) {
+                const string  = currentCell.v
+                const conflict = string.replace(/[( )]/g, '').split(",").map((item) => parseInt(item))
+                conflictSet.push({
+                    leftPlayer: conflict[0],
+                    leftPlayerStrategy: conflict[1],
+                    rightPlayer: conflict[2],
+                    rightPlayerStrategy: conflict[3]    
+                })
+            
+                col++;
+                currentCell = await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
+
+                if (!currentCell) {
+                    row++;
+                    col = 0;
+                    currentCell = conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
+                }
+            }
+
+            return conflictSet
+        
+        } catch (error) {
+            setExcelFileError("Error when reading file");
+        }
+    }
+
+
     const handleGetExcelTemplate = () => {
         if (validateForm()) {
             downloadExcel();
@@ -219,23 +252,18 @@ export default function InputPage() {
     const validateForm = () => {
         let error = false
 
-        console.log("problem name", problemName);
         if (!problemName) {
             setProblemNameError("Problem name must not be empty");
             error = true;
         } else {
-            console.log("free name");
             setProblemNameError("");
         }
 
         if (specialPlayerExists) {
             if (!specialPlayerPropsNum) {
                 setSpecialPlayerPropsNumError("Special player properties must not be empty");
-                console.log("over thewre");
-                console.log(specialPlayerPropsNum);
                 error = true;
             } else {
-                console.log('over here');
                 setSpecialPlayerPropsNumError("")
             }
         }
@@ -333,7 +361,6 @@ export default function InputPage() {
 
     const handleFileInput = (event) => {
         setExcelFile(event.target.files[0]);
-        console.log("file", excelFile);
     };
 
 
@@ -341,7 +368,7 @@ export default function InputPage() {
         <div className="input-page">
             <Loading isLoading={isLoading} />
             <div className="warning">
-                <p className="warning-text">⚠️ This is a beta version of the tool. Special player and conflict set are not supported yet. Please report any bugs to us on MS Teams</p>
+                <p className="warning-text">⚠️ This is a beta version of the tool.Exporting to Excel and Popup and guide page are not supported yet. Please report any bugs to us on MS Teams</p>
             </div>
             <p className='header-text'>Enter information about your problem</p>
             <div className="input-container">

@@ -152,7 +152,7 @@ export default function InsightPage() {
                 tension: 0.1
             },
             {
-                label: 'index',
+                label: 'VEGA',
                 data: data.insights.runtimes.VEGA,
                 fill: false,
                 borderColor: '#EBB02D',

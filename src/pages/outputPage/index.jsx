@@ -8,7 +8,7 @@ import DataContext from "../../context/DataContext"
 import { useNavigate } from 'react-router-dom';
 import NothingToShow from '../../components/NothingToShow';
 import Loading from '../../components/Loading';
-
+import { ms, s, m, h, d } from 'time-convert'
 import axios from 'axios'
 export default function OutputPage() {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function OutputPage() {
   const handleGetMoreInsights = async () => {
     console.log('clicked');
     const body = {
-      specialPlayer: null,
+      specialPlayer: data.problem.specialPlayer,
       normalPlayers: data.problem.players,
       fitnessFunction: data.problem.fitnessFunction,
       defaultPayoffFunction: data.problem.playerPayoffFunction
@@ -41,7 +41,7 @@ export default function OutputPage() {
 
   return (
     <div className='output-page'>
-      <Loading isLoading={isLoading} message='Get more detailed insights. This can take a few minutes...' />
+      <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime} minute(s)...`} />
       <p className='header-text'>{data.problem.name}</p>
       <br />
       <p className='below-headertext'> Optimal solution</p>

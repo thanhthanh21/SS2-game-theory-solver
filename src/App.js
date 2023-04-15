@@ -8,8 +8,10 @@ import {Routes, Route, useNavigate} from 'react-router-dom'
 import { createContext, useState } from "react";
 import DataContext from "./context/DataContext";
 import InsightPage from "./pages/insightPage";
-//TODO: guide page
-//TODO: style the pages
+//TODO: restyle the input-processing page
+//TODO: export result to excel file
+//TODO: not showing for the large number of players in the input-processing page
+//TODO: about page
 function App() {
   const [data, setData] = useState(null)
   const [guideSectionIndex, setGuideSectionIndex] = useState(0)

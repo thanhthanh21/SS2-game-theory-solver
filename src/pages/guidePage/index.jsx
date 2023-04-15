@@ -2,7 +2,7 @@ import React from 'react';
 import './style.scss';
 import { useRef, useContext, useEffect, useState } from 'react'
 import DataContext from '../../context/DataContext';
-
+//TODO: content for fitness function, payoff function, input to excel
 export default function GuidePage() {
     const gettingStartedRef = useRef()
     const problemNameRef = useRef()
