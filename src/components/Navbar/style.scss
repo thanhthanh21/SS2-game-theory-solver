@@ -24,6 +24,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 5px;
+
             // width: 200px;
             // background: red;
 
@@ -40,7 +42,6 @@
             .highlight {
                 background: white;
                 color: #20262E;
-                border-radius: 5px;
             }
         }
     }

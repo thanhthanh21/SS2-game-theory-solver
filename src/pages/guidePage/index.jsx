@@ -2,6 +2,7 @@ import React from 'react';
 import './style.scss';
 import { useRef, useContext, useEffect, useState } from 'react'
 import DataContext from '../../context/DataContext';
+import MathConversionImage from '../../images/math-conversion.png'
 //TODO: content for fitness function, payoff function, input to excel
 export default function GuidePage() {
     const gettingStartedRef = useRef()
@@ -12,6 +13,7 @@ export default function GuidePage() {
     const normalPlayerPropsNumRef = useRef()
     const fitnessFunctionRef = useRef()
     const payoffFunctionRef = useRef()
+    const maxminRef = useRef()
     const inputToExcelRef = useRef()
 
     const refArray = [
@@ -23,6 +25,7 @@ export default function GuidePage() {
         normalPlayerPropsNumRef,
         fitnessFunctionRef,
         payoffFunctionRef,
+        maxminRef,
         inputToExcelRef]
 
     const { guideSectionIndex, setGuideSectionIndex } = useContext(DataContext)
@@ -62,7 +65,7 @@ export default function GuidePage() {
         const ref = refArray[guideSectionIndex]
         scrollTo(ref)
     }, [])
-    
+
     function scrollTo(sectionRef) {
         const index = refArray.indexOf(sectionRef)
         setGuideSectionIndex(index)
@@ -92,7 +95,8 @@ export default function GuidePage() {
                 <div className={`'sidebar__item__title' ${checkIfHightlight(5)}`} onClick={() => scrollTo(normalPlayerPropsNumRef)}>Number of properties of each normal player</div>
                 <div className={`'sidebar__item__title' ${checkIfHightlight(6)}`} onClick={() => scrollTo(fitnessFunctionRef)}>Fitness function</div>
                 <div className={`'sidebar__item__title' ${checkIfHightlight(7)}`} onClick={() => scrollTo(payoffFunctionRef)}>Player payoff function</div>
-                <div className={`'sidebar__item__title' ${checkIfHightlight(8)}`} onClick={() => scrollTo(inputToExcelRef)}>Input to Excel</div>
+                <div className={`'sidebar__item__title' ${checkIfHightlight(8)}`} onClick={() => scrollTo(payoffFunctionRef)}>Maximizing and minimizing</div>
+                <div className={`'sidebar__item__title' ${checkIfHightlight(9)}`} onClick={() => scrollTo(inputToExcelRef)}>Input to Excel</div>
             </div>
 
             <div className="content">
@@ -106,7 +110,7 @@ export default function GuidePage() {
                 <section className='section' ref={problemNameRef} id='1'>
                     <h1>Name of the problem</h1>
                     <p>This section requires the user to provide a name for the problem they are trying to solve using the MOEA framework. The name should be concise and meaningful, reflecting the nature of the game being analyzed. For example, if the game is about two competing companies deciding whether to enter a new market, the name could be "Market Entry Game." Providing a name for the problem helps keep track of different games that are being analyzed and facilitates sharing and collaboration.</p>
-        
+
                 </section>
                 <section className='section' ref={specialPlayerExistsRef} id="2">
                     <h1>Special Player exists.</h1>
@@ -144,8 +148,10 @@ export default function GuidePage() {
                     <p>The fitness function can take on various forms depending on the type of game being analyzed. For example, in a two-player zero-sum game, the fitness function is typically represented by a single scalar value representing the payoff to one player, with the payoff to the other player being the negative of this value. In contrast, in a cooperative game, the fitness function represents the collective payoff of all the players, and may be more complex to calculate.</p>
                     <p>In the context of the MOEA framework, the fitness function is often formulated as an optimization problem, where the goal is to find the set of strategies that maximize the expected payoff of a player or group of players. This requires the use of mathematical tools such as optimization algorithms and numerical methods.</p>
                     <p>It is important to note that the fitness function is specific to the game being analyzed and must be carefully designed to reflect the objectives and constraints of the problem. A poorly designed fitness function can lead to incorrect or suboptimal solutions, so it is crucial to spend time understanding the game and its underlying dynamics before formulating the fitness function.</p>
+                    <p>Fitness function need to be converted from mathematical formula into a form of a string expression that can be parsed by the app. </p>
+                    <p>Note: It's important to note that the string expression must be correctly formatted with respect to order of operations, parentheses, and other mathematical conventions. Any mistakes in formatting could lead to incorrect results when the app processes the fitness function.</p>
                     <div className="gray-board">
-                        <p>Try it here</p>
+                        <img src={MathConversionImage} alt="" />
                     </div>
 
                 </section>
@@ -155,25 +161,53 @@ export default function GuidePage() {
                     <p>It is important to note that the payoff function should satisfy the rationality assumption of the players. That is, each player will choose the strategy that maximizes their expected payoff given the other player's strategy. This is the basis for finding the Nash equilibrium of the game.</p>
                     <p>The payoff function can be a function of the properties of the players, the strategies chosen by the players, or both. In this case, the MOEA framework will construct the payoff function using the number of properties for each normal player and the existence of a special player. The framework will ensure that the payoff function takes into account the properties of each player when calculating the payoff.</p>
                     <p>For example, if there are two properties for each player, the payoff function should be input such that it takes into account the two properties of each normal player. This ensures that the payoff function accurately reflects the game being played and provides an appropriate measure of the players' success.</p>
+                    <p>In the context of game theory, a payoff function is a mathematical formula that calculates the payoffs for each player in a game, based on the strategies they choose. To use a payoff function in an app, the user needs to input the formula as a string expression.</p>
                     <div className="gray-board">
-                        <p>Try it here</p>
+                        <img src={MathConversionImage} alt="" />
                     </div>
 
                 </section>
-                <section className='section' ref={inputToExcelRef} id='8'>
+
+                <section className='section' ref={maxminRef} id='8'>
+                    <h1>Maximizing and minimizing.</h1>
+                    <p>In game theory, maximizing refers to the strategy of attempting to achieve the best possible outcome or highest payoff in a game. This means that a player will try to make decisions and take actions that lead to the most favorable outcome for themselves, even if this means that other players may not benefit as much or may even suffer negative consequences.</p>
+                    <p>On the other hand, minimizing refers to the strategy of trying to achieve the least possible negative outcome or lowest payoff in a game. This means that a player will try to avoid making decisions and taking actions that could lead to a negative outcome for themselves, even if this means that they may not receive the most favorable outcome.</p>
+                    <p>One example of maximizing in game theory is in a game of poker. In poker, a player may make decisions that maximize their potential to win the hand and earn the highest possible payoff. This may involve taking risks, such as betting a large sum of money, in order to increase the potential payoff.</p>
+                    <p>On the other hand, an example of minimizing in game theory is in a game of chicken. In this game, two drivers are racing towards each other and the first to swerve to avoid a collision loses. In this situation, a driver may be motivated to minimize their potential for negative outcomes, such as crashing or being injured, by swerving before the collision occurs.</p>
+                    <p>Note: If a game is maximizing, the payoff function should be negative,</p>
+                </section>
+                <section className='section' ref={inputToExcelRef} id='9'>
                     <h1>Input to Excel</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam architecto eos vitae placeat ea non, inventore numquam atque error quidem facilis mollitia recusandae nesciunt, voluptatem facere itaque reprehenderit commodi modi magnam maiores, quisquam hic voluptates! Nostrum expedita ea praesentium a necessitatibus nesciunt non, similique esse numquam maxime voluptatem neque! Tempore!</p>
+                    <div className="steps">
+                        <b>Input problem data</b>
+                        <ol>
+                            <li>Fill out the necessary information about the problem in the "Problem Information" sheet, including the problem name, whether a special player exists, the number of properties of the special player, the number of normal players, the number of properties of each normal player, the fitness function, and the player payoff function.</li>
+                            <li>If a special player exists, fill out the data of the properties and weights of the special player in the "Special Player" sheet.</li>
+                            <li>Fill out all the necessary data about normal players, including name, number of strategies, and property data of each strategy, in the "Normal Players" sheet.</li>
+                            <li>If necessary, conflict set of strategies to the sheet "Conflict Set".</li>
+                            <li>Save the Excel file.</li>
+                        </ol>
+                    </div>
 
                     <div className="gray-board">
                         <p>Try it here</p>
                     </div>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam architecto eos vitae placeat ea non, inventore numquam atque error quidem facilis mollitia recusandae nesciunt, voluptatem facere itaque reprehenderit commodi modi magnam maiores, quisquam hic voluptates! Nostrum expedita ea praesentium a necessitatibus nesciunt non, similique esse numquam maxime voluptatem neque! Tempore!</p>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam architecto eos vitae placeat ea non, inventore numquam atque error quidem facilis mollitia recusandae nesciunt, voluptatem facere itaque reprehenderit commodi modi magnam maiores, quisquam hic voluptates! Nostrum expedita ea praesentium a necessitatibus nesciunt non, similique esse numquam maxime voluptatem neque! Tempore!</p>
+                    <div className="steps">
+                        <b>Process the Excel file</b>
+                        <ol>
+                            <li>Open the drag and drop area in the application.</li>
+                            <li>Drag and drop the Excel file into the designated area.</li>
+                            <li>Wait for the application to process the file.</li>
+                            <li>Review the game theory problem information and data in the application.</li>
+                        </ol>
+
+                    </div>
                     <div className="gray-board">
-                        <p>Video here</p>
+
+                        <iframe width="800" height="500" src="https://www.youtube.com/embed/mhmGwTDpPf0" title="Billie Eilish - i love you (Live At The Greek Theatre)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>                    
                     </div>
                 </section>
             </div>
         </div>
     )
-}
+}   

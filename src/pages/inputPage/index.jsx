@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom'
 
 import Loading from '../../components/Loading';
+import MaxMinCheckbox from '../../components/MaxMinCheckbox'
 
 export default function InputPage() {
     const [excelFile, setExcelFile] = useState(null);
@@ -24,6 +25,7 @@ export default function InputPage() {
     const [normalPlayerPropsNum, setNormalPlayerPropsNum] = useState(null);
     const [fitnessFunction, setFitnessFunction] = useState("");
     const [playerPayoffFunction, setPlayerPayoffFunction] = useState("");
+    const [isMaximizing, setIsMaximizing] = useState(false);
 
     const [problemNameError, setProblemNameError] = useState("");
     const [specialPlayerExistsError, setSpecialPlayerExistsError] = useState("");
@@ -217,15 +219,15 @@ export default function InputPage() {
             let currentCell = await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
 
             while (currentCell) {
-                const string  = currentCell.v
+                const string = currentCell.v
                 const conflict = string.replace(/[( )]/g, '').split(",").map((item) => parseInt(item))
                 conflictSet.push({
                     leftPlayer: conflict[0],
                     leftPlayerStrategy: conflict[1],
                     rightPlayer: conflict[2],
-                    rightPlayerStrategy: conflict[3]    
+                    rightPlayerStrategy: conflict[3]
                 })
-            
+
                 col++;
                 currentCell = await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
 
@@ -237,7 +239,7 @@ export default function InputPage() {
             }
 
             return conflictSet
-        
+
         } catch (error) {
             setExcelFileError("Error when reading file");
         }
@@ -249,6 +251,7 @@ export default function InputPage() {
             downloadExcel();
         }
     }
+    
     const validateForm = () => {
         let error = false
 
@@ -307,6 +310,11 @@ export default function InputPage() {
 
     const downloadExcel = () => {
         const workbook = XLSX.utils.book_new();
+        let payoffFunction = playerPayoffFunction;
+        // if the problem is maximizing, then the payoff function need to to negative 
+        if (isMaximizing) {
+            payoffFunction = "-(" + playerPayoffFunction + ")" 
+        }
         const sheet1 = XLSX.utils.aoa_to_sheet([
             ["Problem name", problemName],
             ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],
@@ -314,19 +322,14 @@ export default function InputPage() {
             ["Number of normal players", Number(normalPlayerNum)],
             ["Number of properties of each normal player", Number(normalPlayerPropsNum)],
             ["Fitness function", fitnessFunction],
-            ["Player payoff function", playerPayoffFunction]
+            ["Player payoff function", payoffFunction]
         ]);
 
         XLSX.utils.book_append_sheet(workbook, sheet1, 'Problem information');
-        // XLSX.utils.sheet_set_column_width(sheet1, 1, 1, 40);
-        // XLSX.utils.sheet_set_column_width(sheet1, 2, 2, 50);
 
         if (specialPlayerExists) {
             const sheet2 = XLSX.utils.aoa_to_sheet([["Properties", "Weights"]]);
             XLSX.utils.book_append_sheet(workbook, sheet2, 'Special player');
-            // XLSX.utils.sheet_format_cols(sheet2, [{ wch: 20 }, { wch: 20 }]);
-            // XLSX.utils.sheet_set_column_width(sheet2, 1, 1, 20);
-            // XLSX.utils.sheet_set_column_width(sheet2, 2, 2, 20);
         }
 
         const sheet3 = XLSX.utils.aoa_to_sheet([]);
@@ -367,9 +370,6 @@ export default function InputPage() {
     return (
         <div className="input-page">
             <Loading isLoading={isLoading} />
-            <div className="warning">
-                <p className="warning-text">⚠️ This is a beta version of the tool.Exporting to Excel and Popup and guide page are not supported yet. Please report any bugs to us on MS Teams</p>
-            </div>
             <p className='header-text'>Enter information about your problem</p>
             <div className="input-container">
                 <div className="row">
@@ -438,6 +438,13 @@ export default function InputPage() {
                         guideSectionIndex={7}
                     />
                 </div>
+
+                <div className="row">
+                    <MaxMinCheckbox 
+                        isMaximizing={isMaximizing}
+                        setIsMaximizing={setIsMaximizing}
+                    /> 
+                </div>
             </div>
             <div className="btn" onClick={handleGetExcelTemplate}>
                 <p>Get Excel Template</p>
@@ -446,9 +453,9 @@ export default function InputPage() {
 
             <div className="guide-box">
                 <p>Get the Excel file template, input your data, then drag & drop it to the box below</p>
-                <Link to='/guide' className='guide-link' onClick={e => setGuideSectionIndex(8)}> Learn more on how to input to file Excel</Link>
-
+                <Link to='/guide' className='guide-link' onClick={e => setGuideSectionIndex(9)}> Learn more on how to input to file Excel</Link>
             </div>
+
 
 
             {excelFileError && <p className='file-error'>{excelFileError}</p>}

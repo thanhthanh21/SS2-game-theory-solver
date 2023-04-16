@@ -3,12 +3,13 @@ import React from 'react'
 import "./style.scss"
 import { useNavigate } from 'react-router'
 
-import { useContext, useState } from 'react'
+import { useContext, useState , useEffect} from 'react'
 import Player from '../../components/Player';
 import axios from 'axios';
 import DataContext from "../../context/DataContext"
 import NothingToShow from '../../components/NothingToShow';
 import Loading from '../../components/Loading';
+import Popup from '../../components/Popup';
 
 //TODO: algorithm selection
 export default function InputProcessingPage() {
@@ -17,6 +18,10 @@ export default function InputProcessingPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [algorithm, setAlgorithm] = useState('NSGAII');
 
+    useEffect(() => {
+        if (!data || !data.problem) return;
+        document.title = data.problem.name
+    })
     const handleChange = (event) => {
         setAlgorithm(event.target.value);
     }
@@ -60,7 +65,7 @@ export default function InputProcessingPage() {
             <h1 className="Problem">{data.problem.name}</h1>
             
             <button className="click" onClick={handleSolveNow}>Solve now</button>
-            <select name="" id="" value={algorithm} onChange={handleChange} class='algorithm-select'>
+            <select name="" id="" value={algorithm} onChange={handleChange} className='algorithm-select'>
                 <option value="NSGAII">NSGAII</option>
                 <option value="eMOEA">εMOEA</option>
                 <option value="PESA2">PESA2</option>

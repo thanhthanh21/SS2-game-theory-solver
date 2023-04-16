@@ -8,24 +8,57 @@ import DataContext from "../../context/DataContext"
 import { useNavigate } from 'react-router-dom';
 import NothingToShow from '../../components/NothingToShow';
 import Loading from '../../components/Loading';
-import { ms, s, m, h, d } from 'time-convert'
+import * as XLSX from 'xlsx'; 
+import { saveAs } from 'file-saver';
+import Popup from '../../components/Popup';
 import axios from 'axios'
 export default function OutputPage() {
   const navigate = useNavigate();
   const { data, setData } = useContext(DataContext)
   const [isLoading, setIsLoading] = useState(false);
+  const [isShowPopup, setIsShowPopup] = useState(false);
+
+ 
+
   const navigateToHome = () => {
     setData(null)
     navigate('/')
   }
+
+
   if (data == null) {
     return (
       <NothingToShow />
     )
   }
-//TODO: estimaet time to get more insights, x70 times slower than solve now
-  const handleGetMoreInsights = async () => {
-    console.log('clicked');
+
+  const handleExportToExcel = async () => {
+    const workbook = XLSX.utils.book_new();
+    const sheet1 = XLSX.utils.aoa_to_sheet([
+      ["Fitness value", data.result.fitnessValue],
+      ["Used algorithm", data.result.algorithm],
+      ["Player name", "Choosen strategy name", "Payoff value"],
+    ]);
+
+    console.log(data.result.players);
+    data.result.players.forEach(player => {
+      const row = [player.playerName, player.strategyName, player.payoff];
+      XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
+    })
+
+    XLSX.utils.book_append_sheet(workbook, sheet1, 'Optiomal solution');
+
+    const wbout = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    saveAs(blob, 'result.xlsx');
+  };
+
+  const handleGetMoreInsights = () => {
+    setIsShowPopup(true);
+  }
+
+  const handlePopupOk = async () => {
+    setIsShowPopup(false);
     const body = {
       specialPlayer: data.problem.specialPlayer,
       normalPlayers: data.problem.players,
@@ -38,16 +71,23 @@ export default function OutputPage() {
     setData({ ...data, insights: res.data.data });
     navigate('/insights')
   }
-
+  
   return (
     <div className='output-page'>
+      <Popup 
+      isShow={isShowPopup}
+      setIsShow={setIsShowPopup}
+      message={`This process can take estimated ${data.estimatedWaitingTime} minute(s) and you will be redirected to another page. Do you want to continue?`}
+      okCallback={handlePopupOk}
+      />
+
       <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime} minute(s)...`} />
       <p className='header-text'>{data.problem.name}</p>
       <br />
       <p className='below-headertext'> Optimal solution</p>
       <div className="output-container">
         <div className="row">
-          <div className="btn">
+          <div className="btn" onClick={handleExportToExcel}>
             <p>Export to Excel</p>
             <img src={ExcelImage} alt="" />
           </div>

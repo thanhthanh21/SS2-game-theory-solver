@@ -8,7 +8,9 @@ import { Chart, registerables } from 'chart.js';
 
 import { useContext } from 'react';
 import DataContext from '../../context/DataContext';
-
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import ExcelImage from '../../images/excel.png'
 
 export default function InsightPage() {
     const { data } = useContext(DataContext);
@@ -120,8 +122,39 @@ export default function InsightPage() {
     // const data = {
     //     "insights": JSON.parse(JSON.stringify(raw))
     // }
+    const handleExportToExcel = async () => {
+        console.log("Exporting to excel");
+        const workbook = XLSX.utils.book_new();
+        const fitnessSheet = XLSX.utils.aoa_to_sheet([
+            ['Iteration', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA'],
+        ])
 
-    if (!data || !data.problem||!data.insights) {
+        const totalRun = data.insights.fitnessValues.NSGAII.length
+        for (let i = 0; i < totalRun; i++) {
+            const row = [i + 1, data.insights.fitnessValues.NSGAII[i], data.insights.fitnessValues.eMOEA[i], data.insights.fitnessValues.PESA2[i], data.insights.fitnessValues.VEGA[i]]
+            XLSX.utils.sheet_add_aoa(fitnessSheet, [row], { origin: -1 })
+        }
+
+        XLSX.utils.book_append_sheet(workbook, fitnessSheet, 'Fitness Values')
+
+        const runtimeSheet = XLSX.utils.aoa_to_sheet([
+            ['Iteration', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA'],
+        ])
+
+        for (let i = 0; i < totalRun; i++) {
+            const row = [i + 1, data.insights.runtimes.NSGAII[i], data.insights.runtimes.eMOEA[i], data.insights.runtimes.PESA2[i], data.insights.runtimes.VEGA[i]]
+            XLSX.utils.sheet_add_aoa(runtimeSheet, [row], { origin: -1 })
+        }
+
+        XLSX.utils.book_append_sheet(workbook, runtimeSheet, 'Runtimes')
+
+        const wbout = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], { type: 'application/octet-stream' });
+        saveAs(blob, "insights.xlsx");
+    }
+
+    
+    if (!data || !data.problem || !data.insights) {
         return (
             <NothingToShow />
         )
@@ -161,7 +194,7 @@ export default function InsightPage() {
         ]
     };
 
-    
+
     const graphOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -173,41 +206,46 @@ export default function InsightPage() {
         <div className='insight-page'>
             <h1 className="Problem">{data.problem.name}</h1>
             <p className='header-text'>Insights</p>
-
-            <div className="fitness-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class='first-col'>Iteration</th>
-                            <th>NSGAII</th>
-                            <th>eMOEA</th>
-                            <th>PESA2</th>
-                            <th>VEGA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            // loop from 1 to 10
-                            Array.from(Array(10).keys()).map((index) => (
-                                <tr key={index}>
-                                    <td class='first-col'>{index + 1}</td>
-                                    <td>{data.insights.fitnessValues.NSGAII[index]}</td>
-                                    <td>{data.insights.fitnessValues.eMOEA[index]}</td>
-                                    <td>{data.insights.fitnessValues.PESA2[index]}</td>
-                                    <td>{data.insights.fitnessValues.VEGA[index]}</td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </table>
-                <p class='figure-description'>Comparison of Fitness Values across different algorithms</p>
-
+            <div className="row">
+                <div className="btn" onClick={handleExportToExcel}>
+                    <p>Export to Excel</p>
+                    <img src={ExcelImage} alt="" />
+                </div>
             </div>
-            <div className="runtime-graph">
-                <Line class='graph' data={graphData} option={graphOptions}/>
-                <p class='figure-description'>Comparison of runtime (in seconds) across various algorithms</p>
+                <div className="fitness-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class='first-col'>Iteration</th>
+                                <th>NSGAII</th>
+                                <th>eMOEA</th>
+                                <th>PESA2</th>
+                                <th>VEGA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                // loop from 1 to 10
+                                Array.from(Array(10).keys()).map((index) => (
+                                    <tr key={index}>
+                                        <td class='first-col'>{index + 1}</td>
+                                        <td>{data.insights.fitnessValues.NSGAII[index]}</td>
+                                        <td>{data.insights.fitnessValues.eMOEA[index]}</td>
+                                        <td>{data.insights.fitnessValues.PESA2[index]}</td>
+                                        <td>{data.insights.fitnessValues.VEGA[index]}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                    <p class='figure-description'>Comparison of Fitness Values across different algorithms</p>
 
+                </div>
+                <div className="runtime-graph">
+                    <Line class='graph' data={graphData} option={graphOptions} />
+                    <p class='figure-description'>Comparison of runtime (in seconds) across various algorithms</p>
+
+                </div>
             </div>
-        </div>
-    );
+            );
 }
