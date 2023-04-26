@@ -92,6 +92,18 @@ export default function InputPage() {
                 })
 
                 setIsLoading(false)
+                const object = {
+                        name: problemInfo.problemName,
+                        specialPlayerExists: problemInfo.specialPlayerExists,
+                        specialPlayerPropsNum: problemInfo.specialPlayerPropsNum,
+                        normalPlayerNum: problemInfo.normalPlayerNum,
+                        normalPlayerPropsNum: problemInfo.normalPlayerPropsNum,
+                        fitnessFunction: problemInfo.fitnessFunction,
+                        playerPayoffFunction: problemInfo.playerPayoffFunction,
+                        specialPlayer: specialPlayers,
+                        players: players,
+                        conflictSet: conflictSet
+                    }
                 navigate('/input-processing')
 
             };
@@ -163,9 +175,9 @@ export default function InputPage() {
             // LOAD PLAYERS
             while (players.length < normalPlayerNum) {
                 const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
-
                 const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
                 const strategyNumber = await normalPlayerWorkSheet[`B${currentRow}`].v;
+                const payoffFunction = await normalPlayerWorkSheet[`C${currentRow}`] ? await normalPlayerWorkSheet[`C${currentRow}`].v : null;
 
                 const strategies = [];
 
@@ -182,7 +194,9 @@ export default function InputPage() {
                         // c (0-based): j starts from 1 because the first column is the strategy name
                         // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
                         const propertyCell = await normalPlayerWorkSheet[XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })];
-                        properties.push(propertyCell.v)
+                        if (propertyCell) {
+                            properties.push(propertyCell.v)
+                        }
                     }
 
                     strategies.push({
@@ -199,8 +213,11 @@ export default function InputPage() {
 
                 players.push({
                     name: playerName,
-                    strategies: strategies
+                    strategies: strategies,
+                    payoffFunction: payoffFunction
+
                 })
+
             }
 
             return players
@@ -251,7 +268,7 @@ export default function InputPage() {
             downloadExcel();
         }
     }
-    
+
     const validateForm = () => {
         let error = false
 
@@ -313,7 +330,7 @@ export default function InputPage() {
         let payoffFunction = playerPayoffFunction;
         // if the problem is maximizing, then the payoff function need to to negative 
         if (isMaximizing) {
-            payoffFunction = "-(" + playerPayoffFunction + ")" 
+            payoffFunction = "(-(" + playerPayoffFunction + "))"
         }
         const sheet1 = XLSX.utils.aoa_to_sheet([
             ["Problem name", problemName],
@@ -440,10 +457,10 @@ export default function InputPage() {
                 </div>
 
                 <div className="row">
-                    <MaxMinCheckbox 
+                    <MaxMinCheckbox
                         isMaximizing={isMaximizing}
                         setIsMaximizing={setIsMaximizing}
-                    /> 
+                    />
                 </div>
             </div>
             <div className="btn" onClick={handleGetExcelTemplate}>

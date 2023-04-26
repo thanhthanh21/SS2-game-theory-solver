@@ -46,7 +46,6 @@ export default function SpecialPlayerInput({ specialPlayerExists, setSpecialPlay
                     type='number'
                     error={error}
                     handleOnChange={(e) => {
-                        console.log("e.target.value", e.target.value);
                         setSpecialPlayerPropsNum(e.target.value)
                     }}
                     value={specialPlayerPropsNum}

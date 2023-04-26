@@ -123,7 +123,6 @@ export default function InsightPage() {
     //     "insights": JSON.parse(JSON.stringify(raw))
     // }
     const handleExportToExcel = async () => {
-        console.log("Exporting to excel");
         const workbook = XLSX.utils.book_new();
         const fitnessSheet = XLSX.utils.aoa_to_sheet([
             ['Iteration', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA'],

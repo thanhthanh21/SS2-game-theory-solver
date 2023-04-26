@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react'
 export default function Header() {
     const location = useLocation();
     const [path, setPath] = useState("");
-    console.log(path == "/guide");
     const navigate = useNavigate();
     const backToHome = () => {
         navigate("/");

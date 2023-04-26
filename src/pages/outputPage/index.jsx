@@ -40,7 +40,6 @@ export default function OutputPage() {
       ["Player name", "Choosen strategy name", "Payoff value"],
     ]);
 
-    console.log(data.result.players);
     data.result.players.forEach(player => {
       const row = [player.playerName, player.strategyName, player.payoff];
       XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
