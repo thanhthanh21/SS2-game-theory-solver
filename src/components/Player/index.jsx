@@ -11,7 +11,9 @@ export default function Player({ name, strategies }) {
   return (
     <div className="contend">
       <div className="name1">
-        <p className="comp nameComp">{name}</p>
+        <div className="comp nameComp">
+          <p>{name}</p>
+          </div>
         <p className="comp strategyComp">{strategies.length} Strategies</p>
         <label className="comp">
         <span className={showMore ? 'fas fa-caret-up' : 'fas fa-caret-down'} onClick={toggleShowMore}></span>

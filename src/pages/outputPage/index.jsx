@@ -76,11 +76,11 @@ export default function OutputPage() {
       <Popup 
       isShow={isShowPopup}
       setIsShow={setIsShowPopup}
-      message={`This process can take estimated ${data.estimatedWaitingTime} minute(s) and you will be redirected to another page. Do you want to continue?`}
+      message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
       okCallback={handlePopupOk}
       />
 
-      <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime} minute(s)...`} />
+      <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} />
       <p className='header-text'>{data.problem.name}</p>
       <br />
       <p className='below-headertext'> Optimal solution</p>

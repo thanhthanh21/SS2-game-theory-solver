@@ -68,7 +68,8 @@
     }
 
     .nameComp {
-        width: 90px;
+        min-width: 150px;
+        width: fit-content;
     }
 
     // .strategyComp {

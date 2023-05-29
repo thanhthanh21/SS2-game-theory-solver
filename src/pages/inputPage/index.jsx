@@ -76,6 +76,8 @@ export default function InputPage() {
                     players = await loadNormalPlayers(workbook, 1, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 1 is the normal player sheet because there is no special player sheet
                     conflictSet = await loadConflictSet(workbook, 2) // sheet 2 is the conflict set sheet
                 }
+
+
                 setData({
                     problem: {
                         name: problemInfo.problemName,
@@ -92,18 +94,6 @@ export default function InputPage() {
                 })
 
                 setIsLoading(false)
-                const object = {
-                        name: problemInfo.problemName,
-                        specialPlayerExists: problemInfo.specialPlayerExists,
-                        specialPlayerPropsNum: problemInfo.specialPlayerPropsNum,
-                        normalPlayerNum: problemInfo.normalPlayerNum,
-                        normalPlayerPropsNum: problemInfo.normalPlayerPropsNum,
-                        fitnessFunction: problemInfo.fitnessFunction,
-                        playerPayoffFunction: problemInfo.playerPayoffFunction,
-                        specialPlayer: specialPlayers,
-                        players: players,
-                        conflictSet: conflictSet
-                    }
                 navigate('/input-processing')
 
             };
@@ -219,6 +209,8 @@ export default function InputPage() {
                 })
 
             }
+
+            console.log(players);
 
             return players
         } catch (error) {
