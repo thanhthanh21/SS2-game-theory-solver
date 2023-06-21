@@ -203,7 +203,7 @@ export default function InsightPage() {
 
     return (
         <div className='insight-page'>
-            <h1 className="Problem">{data.problem.name}</h1>
+            <h1 className="problem-name">{data.problem.name}</h1>
             <p className='header-text'>Insights</p>
             <div className="row">
                 <div className="btn" onClick={handleExportToExcel}>

@@ -5,6 +5,16 @@
     justify-content: center;
     align-items: center;
 
+    .problem-name{
+        font-size: 20px;
+        color: #000;
+        border-bottom: 1px solid black;
+        text-align: center;
+        width: fit-content;
+        margin: 0 auto;
+        padding: 5px 20px;
+    }
+    
     .header-text {
         font-size: 12px;
         color: #000;

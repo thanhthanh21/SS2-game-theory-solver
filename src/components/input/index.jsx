@@ -11,6 +11,11 @@ export default function Input({ type, message, error, handleOnChange, value, des
     const handleMouseOver = () => {
         setShowHint(true);
     }
+
+    const handleMouseLeave = () => {
+        setShowHint(false);
+        
+    }
     return (
         <>
             <div className={`input ${style}`}>
@@ -19,7 +24,7 @@ export default function Input({ type, message, error, handleOnChange, value, des
                     <input type="number" placeholder={message} onChange={handleOnChange} value={value} min={1}/>
                 }
 
-                <i className="info fa-solid fa-info" onMouseOver={handleMouseOver}></i>
+                <i className="info fa-solid fa-info" onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}></i>
                 <InputHint showHint={showHint} setShowHint={setShowHint} heading={message} guideSectionIndex={guideSectionIndex} description={description}/>
 
             </div>

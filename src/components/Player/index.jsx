@@ -1,7 +1,7 @@
 import React from "react"
 import "./style.scss";
 import { useState } from 'react'
-export default function Player({ name, strategies }) {
+export default function Player({ index, name, strategies }) {
   const [showMore, setShowMore] = useState(false)
 
   const toggleShowMore = () => {
@@ -9,20 +9,20 @@ export default function Player({ name, strategies }) {
   }
 
   return (
-    <div className="contend">
-      <div className="name1">
-        <div className="comp nameComp">
-          <p>{name}</p>
+    <div className={`Player ${showMore ? 'show-more' : ''}`} onClick={toggleShowMore}>
+      <div className="info">
+        <div className="name">
+          <p><span className="bold">#{index + 1}:</span> {name}</p>
           </div>
-        <p className="comp strategyComp">{strategies.length} Strategies</p>
-        <label className="comp">
+        <p className="strategyNum">{strategies.length} Strategies</p>
+        <label className="show-more-btn">
         <span className={showMore ? 'fas fa-caret-up' : 'fas fa-caret-down'} onClick={toggleShowMore}></span>
-      </label>  
+        </label>  
       </div>
       {showMore && <div className="menubar">
         <ul>
           {strategies.map((strategy, index) => (
-            <li>{strategy.name}</li>
+            <li className='strategy-name'> <span className="bold">Strategy #{index + 1}:</span> {strategy.name} ({strategy.properties.length} {strategy.properties.length > 1 ? 'Properties': 'Property'})</li>
           ))}
         </ul>
 

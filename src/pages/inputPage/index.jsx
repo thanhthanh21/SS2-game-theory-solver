@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom'
 
 import Loading from '../../components/Loading';
 import MaxMinCheckbox from '../../components/MaxMinCheckbox'
+import PopupContext from '../../context/PopupContext';
 
 export default function InputPage() {
     const [excelFile, setExcelFile] = useState(null);
@@ -39,6 +40,7 @@ export default function InputPage() {
     const [excelFileError, setExcelFileError] = useState('');
 
     const { data, setData, setGuideSectionIndex } = useContext(DataContext)
+    const { displayPopup } = useContext(PopupContext)
 
     const navigate = useNavigate();
 
@@ -50,33 +52,45 @@ export default function InputPage() {
                 setExcelFileError("");
                 const data = readExcelFile(excelFile);
             } else {
-                setExcelFileError("Not an Excel file");
+                displayPopup("Something went wrong!", "The file was not an Excel file!", true)
+                setExcelFileError("The file was not an Excel file!")
+
             }
         }
     }, [excelFile])
 
     const readExcelFile = async (file) => {
         const reader = new FileReader();
+        setIsLoading(true)
+
         try {
             reader.onload = async (e) => {
-                setIsLoading(true)
                 const excelData = e.target.result;
                 const workbook = XLSX.read(excelData, { type: 'binary' });
 
                 const problemInfo = await loadProblemInfo(workbook, 0);
+                if (!problemInfo) return // stop processing in case of error
+
                 let specialPlayers = null
                 let players = null
                 let conflictSet = null;
 
                 if (problemInfo.specialPlayerExists) {
                     specialPlayers = await loadSpecialPlayer(workbook, 1) // sheet 1 is the special player sheet
+                    if (!specialPlayers) return // stop processing in case of error
+
                     players = await loadNormalPlayers(workbook, 2, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 2 is the normal player sheet
+                    if (!players) return // stop processing in case of error
+
                     conflictSet = await loadConflictSet(workbook, 3) // sheet 3 is the conflict set sheet
+                    if (!conflictSet) return // stop processing in case of error
                 } else {
                     players = await loadNormalPlayers(workbook, 1, problemInfo.normalPlayerNum, problemInfo.normalPlayerPropsNum) // sheet 1 is the normal player sheet because there is no special player sheet
-                    conflictSet = await loadConflictSet(workbook, 2) // sheet 2 is the conflict set sheet
-                }
+                    if (!players) return // stop processing in case of error
 
+                    conflictSet = await loadConflictSet(workbook, 2) // sheet 2 is the conflict set sheet
+                    if (!conflictSet) return // stop processing in case of error
+                }
 
                 setData({
                     problem: {
@@ -101,7 +115,8 @@ export default function InputPage() {
 
 
         } catch (error) {
-            setExcelFileError("Error when reading file");
+            setIsLoading(false)
+            displayPopup("Something went wrong!", "Check the input file again for contact the admin!", true)
         }
     };
 
@@ -128,7 +143,8 @@ export default function InputPage() {
                 playerPayoffFunction
             }
         } catch (error) {
-            setExcelFileError("Error when reading file");
+            setIsLoading(false)
+            displayPopup("Something went wrong!", "Error when loading the Problem Information sheet", true)
         }
     }
 
@@ -150,23 +166,31 @@ export default function InputPage() {
                 weights
             }
         } catch (error) {
-            setExcelFileError("Error when reading file");
+            setIsLoading(false)
+            displayPopup("Something went wrong!", "Error when loading the Special Player sheet", true)
+
         }
     }
 
     const loadNormalPlayers = async (workbook, sheetNumber, normalPlayerNum, normalPlayerPropsNum) => {
+        let currentRow = 1;
+        const players = [];
+        let errorMessage = null
         try {
             const sheetName = await workbook.SheetNames[sheetNumber];
             const normalPlayerWorkSheet = await workbook.Sheets[sheetName];
-            const players = [];
             let currentPlayer = 0;
-            let currentRow = 1;
 
             // LOAD PLAYERS
             while (players.length < normalPlayerNum) {
                 const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
                 const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
                 const strategyNumber = await normalPlayerWorkSheet[`B${currentRow}`].v;
+                
+                if (!strategyNumber) {
+                    errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow}}. Number of strategies is invalid`
+                    throw new Error()
+                }
                 const payoffFunction = await normalPlayerWorkSheet[`C${currentRow}`] ? await normalPlayerWorkSheet[`C${currentRow}`].v : null;
 
                 const strategies = [];
@@ -178,7 +202,6 @@ export default function InputPage() {
 
                     const strategyName = strategyNameCell ? strategyNameCell.v : `Strategy ${i}`; // because the strategy name is optional
                     const properties = []
-
                     // LOAD PROPERTIES
                     for (let j = 1; j <= normalPlayerPropsNum; j++) {
                         // c (0-based): j starts from 1 because the first column is the strategy name
@@ -189,17 +212,30 @@ export default function InputPage() {
                         }
                     }
 
+                    if (!properties.length) {
+                        errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow + i}. Properties of strategy are invalid`
+                        throw new Error()
+                    }
+
                     strategies.push({
                         name: strategyName,
                         properties: properties
                     })
 
                 }
+                
+                console.log(currentRow);
 
-                // currentRow + strategyNumber is the row of the last strategy,
-                // and plus 1 because the next row is the player name
-                currentRow += strategyNumber + 1;
+                let allStrategiesHaveSameNumOfProps = strategies.every(strategy => {
+                    const firstStrategy = strategies[0]
+                    return strategy.properties.length = firstStrategy.properties.length
+                })
 
+                if (!allStrategiesHaveSameNumOfProps) {
+                    console.log('asdsad');
+                    errorMessage = `Error when loading the player#${players.length + 1}. All strategies of a player must have the same number of properties!`
+                    throw new Error()
+                }
 
                 players.push({
                     name: playerName,
@@ -207,14 +243,17 @@ export default function InputPage() {
                     payoffFunction: payoffFunction
 
                 })
-
+                currentRow += strategyNumber + 1;
+                currentPlayer ++;
             }
-
-            console.log(players);
 
             return players
         } catch (error) {
-            setExcelFileError("Error when reading file");
+            if (!errorMessage) {
+                errorMessage = `Error when loading Normal Player sheet, row = ${currentRow}`
+            }
+            setIsLoading(false)
+            displayPopup("Something went wrong!", errorMessage, true)
         }
     }
 
@@ -250,10 +289,10 @@ export default function InputPage() {
             return conflictSet
 
         } catch (error) {
-            setExcelFileError("Error when reading file");
+            setIsLoading(false)
+            displayPopup("Something went wrong!", 'Error when loading the Conflict Matrix sheet', true)
         }
     }
-
 
     const handleGetExcelTemplate = () => {
         if (validateForm()) {
@@ -320,10 +359,7 @@ export default function InputPage() {
     const downloadExcel = () => {
         const workbook = XLSX.utils.book_new();
         let payoffFunction = playerPayoffFunction;
-        // if the problem is maximizing, then the payoff function need to to negative 
-        if (isMaximizing) {
-            payoffFunction = "(-(" + playerPayoffFunction + "))"
-        }
+
         const sheet1 = XLSX.utils.aoa_to_sheet([
             ["Problem name", problemName],
             ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],
@@ -334,6 +370,16 @@ export default function InputPage() {
             ["Player payoff function", payoffFunction]
         ]);
 
+        let isMaximizingRow = ["Is maximzing problem", "False"]
+
+        if (isMaximizing) {
+            // add one more row
+            isMaximizingRow = ["Is maximzing problem", "True"]
+
+        }
+        XLSX.utils.sheet_add_aoa(sheet1, [isMaximizingRow], { origin: -1 });
+
+
         XLSX.utils.book_append_sheet(workbook, sheet1, 'Problem information');
 
         if (specialPlayerExists) {
@@ -341,8 +387,33 @@ export default function InputPage() {
             XLSX.utils.book_append_sheet(workbook, sheet2, 'Special player');
         }
 
-        const sheet3 = XLSX.utils.aoa_to_sheet([]);
+        const sheet3 = XLSX.utils.aoa_to_sheet([["Player 1's Name", "2 (Number of strategies)"]]);
         XLSX.utils.book_append_sheet(workbook, sheet3, 'Normal player');
+
+        // add some  example data for sheet3 
+        const row2 = ["Strategy 1's name"]
+        const row3 = ["Strategy 2's name"]
+        for (let i = 0; i < Number(normalPlayerPropsNum); i++) {
+            row2.push(`Property ${i + 1}`)
+            row3.push(`Property ${i + 1}`)
+        }
+
+        XLSX.utils.sheet_add_aoa(sheet3, [row2, row3], { origin: -1 })
+        if (Number(normalPlayerNum)) {
+            const row4 = ["Player 2's Name", "3 (Number of strategies)"]
+            const row5 = ["Strategy 1's name"]
+            const row6 = ["Strategy 2's name"]
+            const row7 = ["Strategy 3's name"]
+
+            for (let i = 0; i < Number(normalPlayerPropsNum); i++) {
+                row5.push(`Property ${i + 1}`)
+                row6.push(`Property ${i + 1}`)
+                row7.push(`Property ${i + 1}`)
+            }
+            XLSX.utils.sheet_add_aoa(sheet3, [row4, row5, row6, row7], { origin: -1 })
+        }
+
+
         const sheet4 = XLSX.utils.aoa_to_sheet([]);
         XLSX.utils.book_append_sheet(workbook, sheet4, 'Conflict matrix');
 
@@ -357,8 +428,6 @@ export default function InputPage() {
         setExcelFile(event.dataTransfer.files[0]);
         event.target.classList.remove("dragging")
         //TODO: handle file validation
-
-
     }
 
     const handleOnDragEnter = (event) => {
@@ -377,120 +446,113 @@ export default function InputPage() {
 
 
     return (
-        <div className="input-page">
-            <Loading isLoading={isLoading} />
-            <p className='header-text'>Enter information about your problem</p>
-            <div className="input-container">
-                <div className="row">
-                    <Input
-                        message='Name of the problem'
-                        type='text'
-                        error={problemNameError}
-                        handleOnChange={(e) => setProblemName(e.target.value)}
-                        value={problemName}
-                        description="The name should be concise and meaningful, reflecting the nature of the game being analyzed"
-                        guideSectionIndex={1}
-                    />
+        <>
+            <div className="input-page">
+                <Loading isLoading={isLoading} />
+                <p className='header-text'>Enter information about your problem</p>
+                <div className="input-container">
+                    <div className="row">
+                        <Input
+                            message='Name of the problem'
+                            type='text'
+                            error={problemNameError}
+                            handleOnChange={(e) => setProblemName(e.target.value)}
+                            value={problemName}
+                            description="The name should be concise and meaningful, reflecting the nature of the game being analyzed"
+                            guideSectionIndex={1}
+                        />
+                    </div>
+                    <div className="row">
+                        <SpecialPlayerInput
+                            specialPlayerExists={specialPlayerExists}
+                            setSpecialPlayerExists={setSpecialPlayerExists}
+                            specialPlayerPropsNum={specialPlayerPropsNum}
+                            setSpecialPlayerPropsNum={setSpecialPlayerPropsNum}
+                            error={specialPlayerPropsNumError}
+                        />
+                    </div>
+
+                    <div className="row">
+                        <Input
+                            message='Number of normal players'
+                            text='number'
+                            error={normalPlayerNumError}
+                            handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
+                            value={normalPlayerNum}
+                            description="A positive number that reflects the number of players involved to ensure that the resulting Nash equilibrium is valid"
+                            guideSectionIndex={4}
+
+                        />
+                        <Input
+                            message='Number of properties each strategy of normal player'
+                            text='number'
+                            error={normalPlayerPropsNumError}
+                            handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
+                            value={normalPlayerPropsNum}
+                            description="A property is a characteristic or attribute that a player has that affects their actions or outcomes in the game"
+                            guideSectionIndex={5}
+                        />
+                    </div>
+
+                    <div className="row">
+                        <Input
+                            message='Fitness function'
+                            type='text'
+                            error={fitnessFunctionError}
+                            handleOnChange={(e) => setFitnessFunction(e.target.value)}
+                            value={fitnessFunction}
+                            description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
+                            guideSectionIndex={6}
+                        />
+                    </div>
+
+                    <div className="row">
+                        <Input
+                            message='Player payoff function'
+                            type='text'
+                            error={playerPayoffFunctionError}
+                            handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
+                            value={playerPayoffFunction}
+                            description="The player payoff function is a mathematical function that determines the outcome of the game by assigning a payoff value to each player based on the strategies chosen by all the players in the game"
+                            guideSectionIndex={7}
+                        />
+                    </div>
+
+                    <div className="row">
+                        <MaxMinCheckbox
+                            isMaximizing={isMaximizing}
+                            setIsMaximizing={setIsMaximizing}
+                        />
+                    </div>
                 </div>
-                <div className="row">
-                    <SpecialPlayerInput
-                        specialPlayerExists={specialPlayerExists}
-                        setSpecialPlayerExists={setSpecialPlayerExists}
-                        specialPlayerPropsNum={specialPlayerPropsNum}
-                        setSpecialPlayerPropsNum={setSpecialPlayerPropsNum}
-                        error={specialPlayerPropsNumError}
-                    />
+                <div className="btn" onClick={handleGetExcelTemplate}>
+                    <p>Get Excel Template</p>
+                    <img src={ExcelImage} alt="" />
                 </div>
 
-                <div className="row">
-                    <Input
-                        message='Number of normal players'
-                        text='number'
-                        error={normalPlayerNumError}
-                        handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
-                        value={normalPlayerNum}
-                        description="A positive number that reflects the number of players involved to ensure that the resulting Nash equilibrium is valid"
-                        guideSectionIndex={4}
-
-                    />
-                    <Input
-                        message='Number of properties each strategy of normal player'
-                        text='number'
-                        error={normalPlayerPropsNumError}
-                        handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
-                        value={normalPlayerPropsNum}
-                        description="A property is a characteristic or attribute that a player has that affects their actions or outcomes in the game"
-                        guideSectionIndex={5}
-                    />
+                <div className="guide-box">
+                    <p>Get the Excel file template, input your data, then drag & drop it to the box below</p>
+                    <Link to='/guide' className='guide-link' onClick={e => setGuideSectionIndex(9)}> Learn more on how to input to file Excel</Link>
                 </div>
 
-                <div className="row">
-                    <Input
-                        message='Fitness function'
-                        type='text'
-                        error={fitnessFunctionError}
-                        handleOnChange={(e) => setFitnessFunction(e.target.value)}
-                        value={fitnessFunction}
-                        description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
-                        guideSectionIndex={6}
-                    />
-                </div>
 
-                <div className="row">
-                    <Input
-                        message='Player payoff function'
-                        type='text'
-                        error={playerPayoffFunctionError}
-                        handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
-                        value={playerPayoffFunction}
-                        description="The player payoff function is a mathematical function that determines the outcome of the game by assigning a payoff value to each player based on the strategies chosen by all the players in the game"
-                        guideSectionIndex={7}
-                    />
-                </div>
 
-                <div className="row">
-                    <MaxMinCheckbox
-                        isMaximizing={isMaximizing}
-                        setIsMaximizing={setIsMaximizing}
-                    />
+                {excelFileError && <p className='file-error'>{excelFileError}</p>}
+                <div className={excelFileError ? 'drag-area file-error' : 'drag-area'}
+                    onDrop={handleDrop}
+                    onDragEnter={handleOnDragEnter}
+                    onDragLeave={handleOnDragLeave}
+                    onDragOver={handleOnDragEnter}
+                >
+                    <p className='drag-text'>{excelFile ? excelFile.name : 'Drag and drop a file here'}</p>
+                    <label htmlFor="select-file" id='select-file-label'>Choose a file</label>
+                    <input type="file" id="select-file" onChange={handleFileInput} />
                 </div>
             </div>
-            <div className="btn" onClick={handleGetExcelTemplate}>
-                <p>Get Excel Template</p>
-                <img src={ExcelImage} alt="" />
-            </div>
-
-            <div className="guide-box">
-                <p>Get the Excel file template, input your data, then drag & drop it to the box below</p>
-                <Link to='/guide' className='guide-link' onClick={e => setGuideSectionIndex(9)}> Learn more on how to input to file Excel</Link>
-            </div>
 
 
+        </>
 
-            {excelFileError && <p className='file-error'>{excelFileError}</p>}
-            <div className={excelFileError ? 'drag-area file-error' : 'drag-area'}
-                onDrop={handleDrop}
-                onDragEnter={handleOnDragEnter}
-                onDragLeave={handleOnDragLeave}
-                onDragOver={handleOnDragEnter}
-            >
-                <p className='drag-text'>{excelFile ? excelFile.name : 'Drag and drop a file here'}</p>
-                <label htmlFor="select-file" id='select-file-label'>Choose a file</label>
-                <input type="file" id="select-file" onChange={handleFileInput} />
-            </div>
-        </div>
+
     )
 }
-
-// const [excelFile, setExcelFile] = useState(null);
-
-// const handleDrop = (event) => {
-//     event.preventDefault();
-//     setExcelFile(event.dataTransfer.files[0]);
-// }
-
-// <div className="drag-area" onDrop={handleDrop} onDragEnter={handleOnDragEnter} onDragLeave={handleOnDragLeave}>
-//     <p className='drag-text'>{excelFile ? excelFile.name : 'Drag and drop a file here'}</p>
-//     <label htmlFor="select-file" id='select-file-label'>Choose a file</label>
-//     <input type="file" id="select-file" handleOnChange={handleFileInput} />
-// </div>

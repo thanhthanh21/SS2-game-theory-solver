@@ -8,17 +8,21 @@ import DataContext from "../../context/DataContext"
 import { useNavigate } from 'react-router-dom';
 import NothingToShow from '../../components/NothingToShow';
 import Loading from '../../components/Loading';
-import * as XLSX from 'xlsx'; 
+import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import Popup from '../../components/Popup';
 import axios from 'axios'
+import EvaluationChooser from '../../components/EvaluationChooser';
+
+
 export default function OutputPage() {
   const navigate = useNavigate();
   const { data, setData } = useContext(DataContext)
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
+  const [evaluationParam, setEvaluationParam] = useState(100)
 
- 
+
 
   const navigateToHome = () => {
     setData(null)
@@ -70,18 +74,18 @@ export default function OutputPage() {
     setData({ ...data, insights: res.data.data });
     navigate('/insights')
   }
-  
+
   return (
     <div className='output-page'>
-      <Popup 
-      isShow={isShowPopup}
-      setIsShow={setIsShowPopup}
-      message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
-      okCallback={handlePopupOk}
+      <Popup
+        isShow={isShowPopup}
+        setIsShow={setIsShowPopup}
+        message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
+        okCallback={handlePopupOk}
       />
 
       <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} />
-      <p className='header-text'>{data.problem.name}</p>
+      <h1 className="problem-name">{data.problem.name}</h1>
       <br />
       <p className='below-headertext'> Optimal solution</p>
       <div className="output-container">
@@ -90,11 +94,19 @@ export default function OutputPage() {
             <p>Export to Excel</p>
             <img src={ExcelImage} alt="" />
           </div>
-          <div className="btn" onClick={handleGetMoreInsights}>
+        </div>
+        <div className="param-box">
+          <p className='estimated-time'>Estimated time for insight running: <span className="bold">{` ${data.estimatedWaitingTime || 1} minute(s)`}</span> </p>
+          <EvaluationChooser
+            evaluation={evaluationParam}
+            setEvaluation={setEvaluationParam}
+          />
+          <div className="btn insight-btn" onClick={handleGetMoreInsights}>
             <p>Get more insights</p>
             <img src={GraphImage} alt="" />
           </div>
         </div>
+
       </div>
       <br />
       <p className='below-headertext'> Fitness value: {data.result.fitnessValue}</p>

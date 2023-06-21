@@ -5,6 +5,15 @@
   justify-content: center;
   padding: 0 30px;
 
+  .problem-name {
+    font-size: 20px;
+    color: #000;
+    border-bottom: 1px solid black;
+    text-align: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 5px 20px;
+  }
 
   .header-text {
     font-size: 16px;
@@ -41,6 +50,37 @@
     justify-content: center;
     align-items: center;
     gap: 20px;
+
+  }
+
+
+  .param-box {
+    background: var(--grey);
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    gap: 20px;
+
+    .estimated-time {
+
+      min-width: 280px;
+      font-size:13px;
+      text-align: center;
+      // background: red;
+    }
+
+    .insight-btn {
+      background: rgb(133, 132, 132);
+      color: white;
+      margin: 0 auto;
+      &:hover {
+        background: black;
+        color: white;
+      }
+    }
 
   }
 

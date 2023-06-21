@@ -3,10 +3,15 @@ import './style.scss';
 import InputHint from '../InputHint';
 import { useState, useContext } from 'react';
 
-export default function Popup({ isMaximizing, setIsMaximizing  }) {
+export default function ({ isMaximizing, setIsMaximizing  }) {
     const [showHint, setShowHint] = useState(false);
     const handleMouseOver = () => {
         setShowHint(true)
+    }
+
+    const handleMouseLeave = () => {
+        setShowHint(false);
+        
     }
     return (
         <div className="max-min-checkbox">
@@ -19,7 +24,7 @@ export default function Popup({ isMaximizing, setIsMaximizing  }) {
                     value={isMaximizing}
                 />
                 <p>Is maximizing problem</p>
-                <i className="info fa-solid fa-info" onMouseOver={handleMouseOver}></i>
+                <i className="info fa-solid fa-info" onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}></i>
 
             </label>
 

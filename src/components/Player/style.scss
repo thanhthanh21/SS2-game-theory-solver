@@ -1,16 +1,4 @@
 
-.playerNum {
-    font-size: 15px;
-    color: #000;
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    margin-top: 50px;
-    ;
-    padding: 0 10px;
-    display: block;
-}
-
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -30,59 +18,64 @@
     display: none;
 }
 
-.menubar ul li {
-    size: 50px;
-    margin-left: 100px;
-    margin-right: 100px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    background-color: rgb(212, 212, 212);
-    padding: 10px;
-    border-radius: 20px;
-    // display:none; 
-}
 
-.contend {
+
+.Player {
     display: block;
-    margin-right: 10px;
-    margin-left: 10px;
-    background-color: rgb(230, 233, 233);
+   
+    background-color: rgb(243, 243, 243);
     margin-top: 10px;
     // padding-top: 5px;
     // padding-bottom: 5px;
-    padding: 0 10px 10px 20px;
-    border-radius: 20px;
+    padding: 5px 10px;
+    border-radius: 5px;
     position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    p {
+        margin: 0;
+    }
 
+    &:hover {
+        background-color: rgb(222, 222, 222);
+
+    }
+
+    .strategy-name {
+        size: 50px;
+        list-style: none;
+        margin: 20px;
+        background-color: rgb(236, 236, 236);
+        padding: 10px;
+        border-radius: 10px;
+        // display:none; 
+    }
 
 }
+.show-more {
+    background-color: rgb(222, 222, 222);
 
-.name1 {
+    .strategy-name {
+    
+        background-color: rgb(255, 255, 255);
+   
+    }
+}
+.info {
     display: flex;
     justify-content:stretch;
-    .comp {
-        text-align: center;
-        padding: 10px;
-        margin-top: 5px;
-        margin-bottom: 5px;
-    }
+    gap: 20px;
+    padding: 5px;
 
-    .nameComp {
-        min-width: 150px;
-        width: fit-content;
-    }
+   
 
-    // .strategyComp {
-    //     position: absolute;
-    //     top: 10px;
-    //     left: 80px;
-    // }
+    .name {
+        min-width: 200px;
+    }
 }
 
 .scrollBar {
     background-color: white;
-    // margin-left: 300px;
-    // margin-right: 300px;
     width: 700px;
     margin: auto;
     padding-bottom: 50px;
