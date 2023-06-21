@@ -43,7 +43,8 @@ export default function InputProcessingPage() {
                 fitnessFunction: data.problem.fitnessFunction,
                 defaultPayoffFunction: data.problem.playerPayoffFunction,
                 conflictSet: data.problem.conflictSet,
-                algorithm: algorithm
+                algorithm: algorithm,
+                evaluation: evaluationParam
             }
             setIsLoading(true);
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/game-theory-solver`, body);

@@ -38,10 +38,10 @@ export default function Input({ evaluation, setEvaluation }) {
                     guideSectionIndex={8}
                 />
                 <p className={`evaluation-param ${checkIfSelected(100) ? 'selected' : ''}`} onClick={e => handleSelect(100)}>100</p>
-                <p className={`evaluation-param ${checkIfSelected(200) ? 'selected' : ''}`} onClick={e => handleSelect(200)}>200</p>
-                <p className={`evaluation-param ${checkIfSelected(300) ? 'selected' : ''}`} onClick={e => handleSelect(300)}>300</p>
                 <p className={`evaluation-param ${checkIfSelected(500) ? 'selected' : ''}`} onClick={e => handleSelect(500)}>500</p>
                 <p className={`evaluation-param ${checkIfSelected(1000) ? 'selected' : ''}`} onClick={e => handleSelect(1000)}>1000</p>
+                <p className={`evaluation-param ${checkIfSelected(5000) ? 'selected' : ''}`} onClick={e => handleSelect(5000)}>5000</p>
+                <p className={`evaluation-param ${checkIfSelected(10000) ? 'selected' : ''}`} onClick={e => handleSelect(10000)}>10000</p>
 
             </div>
 

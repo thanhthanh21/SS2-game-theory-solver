@@ -69,6 +69,9 @@ export default function InputPage() {
                 const workbook = XLSX.read(excelData, { type: 'binary' });
 
                 const problemInfo = await loadProblemInfo(workbook, 0);
+
+                console.log("Problem Info: ");
+                console.log(problemInfo);
                 if (!problemInfo) return // stop processing in case of error
 
                 let specialPlayers = null
@@ -101,6 +104,7 @@ export default function InputPage() {
                         normalPlayerPropsNum: problemInfo.normalPlayerPropsNum,
                         fitnessFunction: problemInfo.fitnessFunction,
                         playerPayoffFunction: problemInfo.playerPayoffFunction,
+                        isMaximizing: problemInfo.isMaximizing,
                         specialPlayer: specialPlayers,
                         players: players,
                         conflictSet: conflictSet
@@ -132,7 +136,8 @@ export default function InputPage() {
             const normalPlayerPropsNum = await problemInfoWorksheet["B5"].v
             const fitnessFunction = await problemInfoWorksheet["B6"].v
             const playerPayoffFunction = await problemInfoWorksheet["B7"].v
-
+            const isMaximizing = await problemInfoWorksheet["B8"]?.v && problemInfoWorksheet["B8"].v.toString().toLowerCase() == 'true'
+            
             return {
                 problemName,
                 specialPlayerExists,
@@ -140,7 +145,8 @@ export default function InputPage() {
                 normalPlayerNum,
                 normalPlayerPropsNum,
                 fitnessFunction,
-                playerPayoffFunction
+                playerPayoffFunction,
+                isMaximizing
             }
         } catch (error) {
             setIsLoading(false)
@@ -187,8 +193,8 @@ export default function InputPage() {
                 const playerName = playerNameCell ? playerNameCell.v : `Player ${currentPlayer + 1}`; // because the player name is optional
                 const strategyNumber = await normalPlayerWorkSheet[`B${currentRow}`].v;
                 
-                if (!strategyNumber) {
-                    errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow}}. Number of strategies is invalid`
+                if (!strategyNumber || typeof strategyNumber !== 'number') {
+                    errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow} . Number of strategies is invalid`
                     throw new Error()
                 }
                 const payoffFunction = await normalPlayerWorkSheet[`C${currentRow}`] ? await normalPlayerWorkSheet[`C${currentRow}`].v : null;
@@ -224,8 +230,6 @@ export default function InputPage() {
 
                 }
                 
-                console.log(currentRow);
-
                 let allStrategiesHaveSameNumOfProps = strategies.every(strategy => {
                     const firstStrategy = strategies[0]
                     return strategy.properties.length = firstStrategy.properties.length
@@ -250,7 +254,7 @@ export default function InputPage() {
             return players
         } catch (error) {
             if (!errorMessage) {
-                errorMessage = `Error when loading Normal Player sheet, row = ${currentRow}`
+                errorMessage = `Error when loading Normal Player sheet, row = ${currentRow}.`
             }
             setIsLoading(false)
             displayPopup("Something went wrong!", errorMessage, true)

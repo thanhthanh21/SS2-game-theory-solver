@@ -66,7 +66,11 @@ export default function OutputPage() {
       specialPlayer: data.problem.specialPlayer,
       normalPlayers: data.problem.players,
       fitnessFunction: data.problem.fitnessFunction,
-      defaultPayoffFunction: data.problem.playerPayoffFunction
+      defaultPayoffFunction: data.problem.playerPayoffFunction,
+      conflictSet: data.problem.conflictSet,
+      isMaximizing: data.problem.isMaximizing,
+      evaluation: evaluationParam
+
     }
     setIsLoading(true);
     const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/problem-result-insights`, body);
