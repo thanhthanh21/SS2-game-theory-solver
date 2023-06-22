@@ -100,7 +100,7 @@ export default function OutputPage() {
           </div>
         </div>
         <div className="param-box">
-          <p className='estimated-time'>Estimated time for insight running: <span className="bold">{` ${data.estimatedWaitingTime || 1} minute(s)`}</span> </p>
+          {/* <p className='estimated-time'>Estimated time for insight running: <span className="bold">{` ${data.estimatedWaitingTime || 1} minute(s)`}</span> </p> */}
           <EvaluationChooser
             evaluation={evaluationParam}
             setEvaluation={setEvaluationParam}
