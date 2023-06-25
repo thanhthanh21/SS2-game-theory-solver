@@ -83,7 +83,7 @@ export default function OutputPage() {
 
       }
       setIsLoading(true);
-      connectWebSocket()
+      await connectWebSocket()
       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/problem-result-insights/${sessionCode}`, body);
       setIsLoading(false);
       setData({ ...data, insights: res.data.data });
@@ -96,10 +96,10 @@ export default function OutputPage() {
   
   }
 
-  const connectWebSocket = () => {
+  const connectWebSocket = async () => {
     let Sock = new SockJS(`${process.env.REACT_APP_BACKEND_URL}/ws`);
     stompClient = over(Sock);
-    stompClient.connect({}, onConnected, onError);
+    await stompClient.connect({}, onConnected, onError);
   }
   const onConnected = () => {
     stompClient.subscribe('/session/' + sessionCode + '/progress', onPrivateMessage);

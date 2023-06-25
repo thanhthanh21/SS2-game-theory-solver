@@ -63,7 +63,7 @@ export default function InputProcessingPage() {
             navigate('/result')
         } catch (err) {
             setIsLoading(false);
-            displayPopup("Running failed", "please check the dataset and try again or contact the admin!", true)
+            displayPopup("Running failed", "Please check the dataset and try again or contact the admin!", true)
         }
 
     }
