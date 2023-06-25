@@ -18,7 +18,7 @@ import PopupContext from '../../context/PopupContext'
 import SockJS from 'sockjs-client';
 import { v4 } from 'uuid';
 import { overWS } from 'stompjs'
-import {over} from 'stompjs';
+import { over } from 'stompjs';
 
 let stompClient = null
 export default function OutputPage() {
@@ -32,7 +32,7 @@ export default function OutputPage() {
   const [loadingMessage, setLoadingMessage] = useState("Processing to get problem insights, please wait...")
   const [loadingEstimatedTime, setLoadingEstimatedTime] = useState(null)
   const [loadingPercentage, setLoadingPercentage] = useState("0%")
-  
+
   const navigateToHome = () => {
     setData(null)
     navigate('/')
@@ -93,7 +93,7 @@ export default function OutputPage() {
       setIsLoading(false);
       displayPopup("Something went wrong!", "Get insights failed!, please contact the admin!", true)
     }
-  
+
   }
 
   const connectWebSocket = async () => {
@@ -111,7 +111,7 @@ export default function OutputPage() {
     // displayPopup("Something went wrong!", "Connect to server failed!, please contact the admin!", true)
   }
 
-  const closeWebSocketConnection = () => {  
+  const closeWebSocketConnection = () => {
     if (stompClient) {
       stompClient.disconnect();
     }
@@ -121,7 +121,7 @@ export default function OutputPage() {
     let payloadData = JSON.parse(payload.body);
     console.log('hihihih');
     console.log(payload.body);
-    
+
     const message = payloadData.message;
 
     // some return data are to show the progress, some are not
@@ -130,7 +130,7 @@ export default function OutputPage() {
       const percentage = Math.floor((payloadData.generation / 40) * 100) + "%"// there will be 40 run for the problem
 
       // showing estimated time, percentage and message
-      if (isFirstRun) {
+      if (!loadingEstimatedTime) {
         // the estimated time is calculated by multiply the first run time with 70 (run 10 times for each of 4 algorithms, with e-MOEa takes long as 3 times as other algorthms)
         const totalEstimatedTime = "Estimated total " + (Math.floor(payloadData.runtime * 70 / 60) || 1) + " minute(s)" // in minutes
         setLoadingEstimatedTime(totalEstimatedTime)
@@ -160,10 +160,10 @@ export default function OutputPage() {
       />
 
       {/* <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} /> */}
-      <Loading isLoading={isLoading} 
-      percentage={loadingPercentage}
-      estimatedTime={loadingEstimatedTime}
-      message={loadingMessage} />
+      <Loading isLoading={isLoading}
+        percentage={loadingPercentage}
+        estimatedTime={loadingEstimatedTime}
+        message={loadingMessage} />
       <h1 className="problem-name">{data.problem.name}</h1>
       <br />
       <p className='below-headertext'> Optimal solution</p>
