@@ -2,6 +2,7 @@
 import React from 'react';
 import './style.scss';
 import { useNavigate } from 'react-router-dom';
+import AstronautImage from '../../images/astronaut.png'
 export default function NothingToShow() {
     const navigate = useNavigate();
 
@@ -12,7 +13,7 @@ export default function NothingToShow() {
     return (
         <div className='nothing-to-show'>
             <p>Nothing to show here</p>
-            <img src="https://iogames.onl/themes/iogames/rs/images/io-games.png" alt="" />
+            <img src={AstronautImage} alt="" />
             <button className='btn' onClick={navigateToHome}>Back to homepage</button>
         </div>
     );

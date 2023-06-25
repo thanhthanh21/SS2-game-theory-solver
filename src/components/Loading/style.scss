@@ -21,11 +21,20 @@
         background-color: rgba(0,0,0,0.5);
     }
 
-    .loading-message {
+    .loading-content {
         // font-size: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         color: #fff;
         margin-top: 1rem;
         z-index: 1001;
+
+        .percentage {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
     }
     .lds-grid {
         display: inline-block;
