@@ -9,7 +9,7 @@ import axios from 'axios';
 import DataContext from "../../context/DataContext"
 import NothingToShow from '../../components/NothingToShow';
 import Loading from '../../components/Loading';
-import EvaluationChooser from '../../components/EvaluationChooser';
+import ParamSettingBox from '../../components/ParamSettingBox';
 import PopupContext from '../../context/PopupContext';
 //TODO: algorithm selection
 export default function InputProcessingPage() {
@@ -17,7 +17,10 @@ export default function InputProcessingPage() {
     const { data, setData } = useContext(DataContext);
     const [isLoading, setIsLoading] = useState(false);
     const [algorithm, setAlgorithm] = useState('NSGAII');
-    const [evaluationParam, setEvaluationParam] = useState(100)
+    const [distributedCoreParam, setDistributedCoreParam] = useState("all")
+    const [populationSizeParam, setPopulationSizeParam] = useState(1000)
+    const [generationParam, setGenerationParam] = useState(100)
+    const [maxTimeParam, setMaxTimeParam] = useState(5000)
 
     const { displayPopup } = useContext(PopupContext)
 
@@ -37,6 +40,7 @@ export default function InputProcessingPage() {
 
     const handleSolveNow = async () => {
         try {
+            //TODO: here request
             const body = {
                 specialPlayer: data.problem.specialPlayer,
                 normalPlayers: data.problem.players,
@@ -44,7 +48,7 @@ export default function InputProcessingPage() {
                 defaultPayoffFunction: data.problem.playerPayoffFunction,
                 conflictSet: data.problem.conflictSet,
                 algorithm: algorithm,
-                evaluation: evaluationParam
+                // evaluation: evaluationParam
             }
             setIsLoading(true);
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/game-theory-solver`, body);
@@ -76,29 +80,32 @@ export default function InputProcessingPage() {
             <h1 className="problem-name">{data.problem.name}</h1>
 
 
-            <div className="param-box">
-                <div className="algo-chooser">
-                    <p className='algorithm-text bold'>Choose an algorithm: </p>
 
-                    <select name="" id="" value={algorithm} onChange={handleChange} className='algorithm-select'>
-                        <option value="NSGAII">NSGAII</option>
-                        <option value="eMOEA">εMOEA</option>
-                        <option value="PESA2">PESA2</option>
-                        <option value="VEGA">VEGA</option>
-                    </select>
-                </div>
 
-                <EvaluationChooser
-                    evaluation={evaluationParam}
-                    setEvaluation={setEvaluationParam}
-                />
+            <ParamSettingBox
+                generationParam={generationParam}
+                setGenerationParam={setGenerationParam}
+                populationSizeParam={populationSizeParam}
+                setPopulationSizeParam={setPopulationSizeParam}
+                maxTimeParam={maxTimeParam}
+                setMaxTimeParam={setMaxTimeParam}
+            />
+
+            <div className="algo-chooser">
+                <p className='algorithm-text bold'>Choose an algorithm: </p>
+
+                <select name="" id="" value={algorithm} onChange={handleChange} className='algorithm-select'>
+                    <option value="NSGAII">NSGAII</option>
+                    <option value="eMOEA">εMOEA</option>
+                    <option value="PESA2">PESA2</option>
+                    <option value="VEGA">VEGA</option>
+                </select>
             </div>
 
             <p className="solve-now-btn" onClick={handleSolveNow}>Solve now</p>
             <p className="playerNum bold">{data.problem.players.length} {data.problem.players.length < 2 ? 'Player' : "Players"}  </p>
 
             <div className="player-container">
-
                 {data.problem.players.map((player, index) => (
                     <div key={index}>
                         <Player index={index} name={player.name} strategies={player.strategies} />

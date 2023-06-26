@@ -12,7 +12,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import Popup from '../../components/Popup';
 import axios from 'axios'
-import EvaluationChooser from '../../components/EvaluationChooser';
+import ParamSettingBox from '../../components/ParamSettingBox';
 import PopupContext from '../../context/PopupContext'
 
 import SockJS from 'sockjs-client';
@@ -176,7 +176,7 @@ export default function OutputPage() {
         </div>
         <div className="param-box">
           {/* <p className='estimated-time'>Estimated time for insight running: <span className="bold">{` ${data.estimatedWaitingTime || 1} minute(s)`}</span> </p> */}
-          <EvaluationChooser
+          <ParamSettingBox 
             evaluation={evaluationParam}
             setEvaluation={setEvaluationParam}
           />

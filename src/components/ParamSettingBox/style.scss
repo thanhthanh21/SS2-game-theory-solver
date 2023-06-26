@@ -1,0 +1,50 @@
+.param-setting-box {
+    background: var(--grey);
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    justify-content: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    gap: 20px;
+
+    .distributed-core-param {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        position: relative;
+        width: 550px;
+        justify-content: space-between;
+        .text {
+            display: flex;
+            gap: 20px;
+        }
+
+        .bold {
+            min-width: 200px;
+            font-size: 13px;
+            line-height: 30px;
+        }
+
+
+
+        .info {
+            border: 1px solid black;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            display: block;
+            line-height: 20px;
+            font-size: 10px;
+            border-radius: 50%;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+
+
+}

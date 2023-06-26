@@ -1,19 +1,25 @@
-.evaluation-chooser {
+.Param {
+    display: flex;
+    gap: 20px;
+    align-items: center;
     position: relative;
-
+    width: 550px;
+    justify-content: space-between;
     .text {
         display: flex;
+        gap: 20px;
+        cursor: pointer;
     }
+
     .bold {
         min-width: 200px;
         font-size: 13px;
         line-height: 30px;
+        white-space: nowrap;
     }
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    
-    
+
+
+
     .info {
         border: 1px solid black;
         width: 20px;
@@ -28,20 +34,14 @@
             cursor: pointer;
         }
     }
-}
 
-.evaluation-chooser {
-    .evaluation-param {
-        padding: 5px 10px;
+    .param-input {
+        width: 175px;
         border-radius: 5px;
-        cursor: pointer;
-
-        &:hover {
-            background-color: rgba(255, 255, 255, 0.516);
-        }
-    }
-
-    .selected {
-        background: white;
+        border: 1px solid black;
+        padding: 10px 10px;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
     }
 }

@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'
 import Loading from '../../components/Loading';
 import MaxMinCheckbox from '../../components/MaxMinCheckbox'
 import PopupContext from '../../context/PopupContext';
-
+import ParamSettingBox from '../../components/ParamSettingBox'
 export default function InputPage() {
     const [excelFile, setExcelFile] = useState(null);
 
@@ -452,6 +452,7 @@ export default function InputPage() {
     return (
         <>
             <div className="input-page">
+
                 <Loading isLoading={isLoading} />
                 <p className='header-text'>Enter information about your problem</p>
                 <div className="input-container">

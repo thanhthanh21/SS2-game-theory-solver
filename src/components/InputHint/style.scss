@@ -16,7 +16,7 @@
     padding: 10px;
     box-shadow: 1px 1px 10px 5px rgb(228, 228, 228);
     animation: slideIn 0.3s ease-out;
-    transform: translate(0%, -50%);
+    transform: translate(-30%, -50%);
 
     h1 {
         font-size: 16px;
@@ -32,7 +32,7 @@
         opacity: 0;
     }
     100% {
-        transform: translate(0%, -50%);
+        transform: translate(-30%, -50%);
         opacity: 1;
     }
 }
