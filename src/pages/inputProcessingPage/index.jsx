@@ -14,7 +14,7 @@ import PopupContext from '../../context/PopupContext';
 //TODO: algorithm selection
 export default function InputProcessingPage() {
     const navigate = useNavigate();
-    const { data, setData } = useContext(DataContext);
+    const { appData, setAppData } = useContext(DataContext);
     const [isLoading, setIsLoading] = useState(false);
     const [algorithm, setAlgorithm] = useState('NSGAII');
     const [distributedCoreParam, setDistributedCoreParam] = useState("all")
@@ -25,14 +25,14 @@ export default function InputProcessingPage() {
     const { displayPopup } = useContext(PopupContext)
 
     useEffect(() => {
-        if (!data || !data.problem) return;
-        document.title = data.problem.name
+        if (!appData || !appData.problem) return;
+        document.title = appData.problem.name
     })
     const handleChange = (event) => {
         setAlgorithm(event.target.value);
     }
     // navigate to home page if there is no problem data
-    if (!data || !data.problem) {
+    if (!appData || !appData.problem) {
         return (
             <NothingToShow />
         )
@@ -42,11 +42,11 @@ export default function InputProcessingPage() {
         try {
             //TODO: here request
             const body = {
-                specialPlayer: data.problem.specialPlayer,
-                normalPlayers: data.problem.players,
-                fitnessFunction: data.problem.fitnessFunction,
-                defaultPayoffFunction: data.problem.playerPayoffFunction,
-                conflictSet: data.problem.conflictSet,
+                specialPlayer: appData.problem.specialPlayer,
+                normalPlayers: appData.problem.players,
+                fitnessFunction: appData.problem.fitnessFunction,
+                defaultPayoffFunction: appData.problem.playerPayoffFunction,
+                conflictSet: appData.problem.conflictSet,
                 algorithm: algorithm,
                 distributedCores: distributedCoreParam,
                 populationSize: populationSizeParam,
@@ -56,17 +56,25 @@ export default function InputProcessingPage() {
             }
             setIsLoading(true);
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/game-theory-solver`, body);
+            console.log("result:");
+            console.log(res.data.data);
             // const res = await axios.post(`http://localhost:8080/api/game-theory-solver`, body);
             const runtime = res.data.data.runtime;
             const usedAlgorithm = res.data.data.algorithm;
 
-            let estimatedWaitingTime = 0;
-            if (usedAlgorithm === 'eMOEA') {
-                estimatedWaitingTime = (runtime * 20);
-            } else {
-                estimatedWaitingTime = (runtime * 70);
+
+            const result = {
+                data: res.data.data,
+                params: {
+                    usedAlgorithm: usedAlgorithm,
+                    distributedCoreParam: distributedCoreParam,
+                    populationSizeParam: populationSizeParam,
+                    generationParam: generationParam,
+                    maxTimeParam: maxTimeParam
+                }
+
             }
-            setData({ ...data, result: res.data.data, estimatedWaitingTime: Math.round(estimatedWaitingTime) });
+            setAppData({ ...appData, result });
             setIsLoading(false);
             navigate('/result')
         } catch (err) {
@@ -81,7 +89,7 @@ export default function InputProcessingPage() {
     return (
         <div className='input-processing-page'>
             <Loading isLoading={isLoading} message='Solve your problem, please do not close this window...' />
-            <h1 className="problem-name">{data.problem.name}</h1>
+            <h1 className="problem-name">{appData.problem.name}</h1>
 
 
 
@@ -109,10 +117,10 @@ export default function InputProcessingPage() {
             </div>
 
             <p className="solve-now-btn" onClick={handleSolveNow}>Solve now</p>
-            <p className="playerNum bold">{data.problem.players.length} {data.problem.players.length < 2 ? 'Player' : "Players"}  </p>
+            <p className="playerNum bold">{appData.problem.players.length} {appData.problem.players.length < 2 ? 'Player' : "Players"}  </p>
 
             <div className="player-container">
-                {data.problem.players.map((player, index) => (
+                {appData.problem.players.map((player, index) => (
                     <div key={index}>
                         <Player index={index} name={player.name} strategies={player.strategies} />
                     </div>

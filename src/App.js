@@ -13,7 +13,7 @@ import Popup from './components/Popup'
 
 //TODO: about page
 function App() {
-  const [data, setData] = useState(null)
+  const [appData, setAppData] = useState(null)
   const [guideSectionIndex, setGuideSectionIndex] = useState(0)
   const [popupError, setPopupError] = useState(false)
   const [popupTitle, setPopupTitle] = useState("")
@@ -29,7 +29,7 @@ function App() {
     }
   }
   return (
-    <DataContext.Provider value={{ data, setData, guideSectionIndex, setGuideSectionIndex }}>
+    <DataContext.Provider value={{ appData, setAppData, guideSectionIndex, setGuideSectionIndex }}>
       <PopupContext.Provider value={{ displayPopup }}>
 
         <div className="App">

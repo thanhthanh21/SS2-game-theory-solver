@@ -23,7 +23,7 @@ import { over } from 'stompjs';
 let stompClient = null
 export default function OutputPage() {
   const navigate = useNavigate();
-  const { data, setData } = useContext(DataContext)
+  const { appData, setAppData } = useContext(DataContext)
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
   const { displayPopup } = useContext(PopupContext)
@@ -37,12 +37,12 @@ export default function OutputPage() {
   const [maxTimeParam, setMaxTimeParam] = useState(5000)
 
   const navigateToHome = () => {
-    setData(null)
+    setAppData(null)
     navigate('/')
   }
 
 
-  if (data == null) {
+  if (appData == null) {
     return (
       <NothingToShow />
     )
@@ -51,17 +51,41 @@ export default function OutputPage() {
   const handleExportToExcel = async () => {
     const workbook = XLSX.utils.book_new();
     const sheet1 = XLSX.utils.aoa_to_sheet([
-      ["Fitness value", data.result.fitnessValue],
-      ["Used algorithm", data.result.algorithm],
+      ["Fitness value", appData.result.data.fitnessValue],
+      ["Used algorithm", appData.result.params.usedAlgorithm],
+      ["Runtime (in seconds)", appData.result.data.runtime],
       ["Player name", "Choosen strategy name", "Payoff value"],
     ]);
 
-    data.result.players.forEach(player => {
+    appData.result.data.players.forEach(player => {
       const row = [player.playerName, player.strategyName, player.payoff];
       XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
     })
 
+
+    const numberOfCores = appData.result.params.distributedCoreParam == 'all' ? 'All available cores' : appData.result.params.distributedCoreParam + " cores"
+    const sheet2 = XLSX.utils.aoa_to_sheet([
+      ["Number of distributed cores", numberOfCores],
+      ["Population size", appData.result.params.populationSizeParam],
+      ["Number of crossover generation", appData.result.params.generationParam],
+      ["Optimization execution max time (in milliseconds)", appData.result.params.maxTimeParam],
+    ]);
+
+    const sheet3 = XLSX.utils.aoa_to_sheet([
+      ["Operating System Family", appData.result.data.computerSpecs.osFamily],
+      ["Operating System Manufacturer", appData.result.data.computerSpecs.osManufacturer],
+      ["Operating System Version", appData.result.data.computerSpecs.osVersion],
+      ["CPU Name", appData.result.data.computerSpecs.cpuName],
+      ["CPU Physical Cores", appData.result.data.computerSpecs.cpuLogicalCores],
+      ["CPU Logical Cores", appData.result.data.computerSpecs.cpuPhysicalCores],
+      ["Total Memory", appData.result.data.computerSpecs.totalMemory],
+    ]);
+
     XLSX.utils.book_append_sheet(workbook, sheet1, 'Optiomal solution');
+    XLSX.utils.book_append_sheet(workbook, sheet2, 'Parameter Configurations');
+    XLSX.utils.book_append_sheet(workbook, sheet3, 'Computer Specifications');
+
+
 
     const wbout = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/octet-stream' });
@@ -76,11 +100,11 @@ export default function OutputPage() {
     try {
       setIsShowPopup(false);
       const body = {
-        specialPlayer: data.problem.specialPlayer,
-        normalPlayers: data.problem.players,
-        fitnessFunction: data.problem.fitnessFunction,
-        defaultPayoffFunction: data.problem.playerPayoffFunction,
-        conflictSet: data.problem.conflictSet,
+        specialPlayer: appData.problem.specialPlayer,
+        normalPlayers: appData.problem.players,
+        fitnessFunction: appData.problem.fitnessFunction,
+        defaultPayoffFunction: appData.problem.playerPayoffFunction,
+        conflictSet: appData.problem.conflictSet,
         distributedCores: distributedCoreParam,
         populationSize: populationSizeParam,
         generation: generationParam,
@@ -89,8 +113,21 @@ export default function OutputPage() {
       setIsLoading(true);
       await connectWebSocket()
       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/problem-result-insights/${sessionCode}`, body);
+      console.log("insight results");
+      console.log(res.data.data);
       setIsLoading(false);
-      setData({ ...data, insights: res.data.data });
+
+      const insights = {
+        data: res.data.data,
+        params: {
+          distributedCoreParam: distributedCoreParam,
+          populationSizeParam: populationSizeParam,
+          generationParam: generationParam,
+          maxTimeParam: maxTimeParam,
+        }
+      }
+      setAppData({ ...appData, insights });
+      closeWebSocketConnection()
       navigate('/insights')
     } catch (err) {
       console.log(err);
@@ -123,8 +160,6 @@ export default function OutputPage() {
 
   const onPrivateMessage = (payload) => {
     let payloadData = JSON.parse(payload.body);
-    console.log('hihihih');
-    console.log(payload.body);
 
     const message = payloadData.message;
 
@@ -168,9 +203,9 @@ export default function OutputPage() {
         percentage={loadingPercentage}
         estimatedTime={loadingEstimatedTime}
         message={loadingMessage} />
-      <h1 className="problem-name">{data.problem.name}</h1>
+      <h1 className="problem-name">{appData.problem.name}</h1>
       <br />
-      <p className='below-headertext'> Optimal solution</p>
+      <p className='below-headertext'>Optimal solution</p>
       <div className="output-container">
         <div className="row">
           <div className="btn" onClick={handleExportToExcel}>
@@ -179,7 +214,6 @@ export default function OutputPage() {
           </div>
         </div>
         <div className="param-box">
-          {/* <p className='estimated-time'>Estimated time for insight running: <span className="bold">{` ${data.estimatedWaitingTime || 1} minute(s)`}</span> </p> */}
           <ParamSettingBox
             distributedCoreParam={distributedCoreParam}
             setDistributedCoreParam={setDistributedCoreParam}
@@ -198,7 +232,7 @@ export default function OutputPage() {
 
       </div>
       <br />
-      <p className='below-headertext'> Fitness value: {data.result.fitnessValue}</p>
+      <p className='below-headertext'> Fitness value: {appData.result.data.fitnessValue}</p>
       <br />
 
       <div className="table-container">
@@ -209,7 +243,7 @@ export default function OutputPage() {
           <div className="column head-column">Payoff value</div>
         </div>
 
-        {data.result.players?.map((player, index) => (
+        {appData.result.data.players?.map((player, index) => (
           <PlayerResult key={index} player={player} index={index + 1} />
         ))}
       </div>

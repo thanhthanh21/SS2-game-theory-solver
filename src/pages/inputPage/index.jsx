@@ -39,7 +39,7 @@ export default function InputPage() {
 
     const [excelFileError, setExcelFileError] = useState('');
 
-    const { data, setData, setGuideSectionIndex } = useContext(DataContext)
+    const {  setAppData, setGuideSectionIndex } = useContext(DataContext)
     const { displayPopup } = useContext(PopupContext)
 
     const navigate = useNavigate();
@@ -95,7 +95,7 @@ export default function InputPage() {
                     if (!conflictSet) return // stop processing in case of error
                 }
 
-                setData({
+                setAppData({
                     problem: {
                         name: problemInfo.problemName,
                         specialPlayerExists: problemInfo.specialPlayerExists,
