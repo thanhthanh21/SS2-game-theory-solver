@@ -48,6 +48,10 @@ export default function InputProcessingPage() {
                 defaultPayoffFunction: data.problem.playerPayoffFunction,
                 conflictSet: data.problem.conflictSet,
                 algorithm: algorithm,
+                distributedCores: distributedCoreParam,
+                populationSize: populationSizeParam,
+                generation: generationParam,
+                maxTime: maxTimeParam,
                 // evaluation: evaluationParam
             }
             setIsLoading(true);
@@ -76,13 +80,15 @@ export default function InputProcessingPage() {
 
     return (
         <div className='input-processing-page'>
-            <Loading isLoading={isLoading} message='Solve your problem...' />
+            <Loading isLoading={isLoading} message='Solve your problem, please do not close this window...' />
             <h1 className="problem-name">{data.problem.name}</h1>
 
 
 
 
             <ParamSettingBox
+                distributedCoreParam={distributedCoreParam}
+                setDistributedCoreParam={setDistributedCoreParam}
                 generationParam={generationParam}
                 setGenerationParam={setGenerationParam}
                 populationSizeParam={populationSizeParam}

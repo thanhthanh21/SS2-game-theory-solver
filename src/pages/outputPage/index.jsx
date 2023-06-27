@@ -26,12 +26,15 @@ export default function OutputPage() {
   const { data, setData } = useContext(DataContext)
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
-  const [evaluationParam, setEvaluationParam] = useState(100)
   const { displayPopup } = useContext(PopupContext)
   const [sessionCode, setSessionCode] = useState(v4())
   const [loadingMessage, setLoadingMessage] = useState("Processing to get problem insights, please wait...")
   const [loadingEstimatedTime, setLoadingEstimatedTime] = useState(null)
   const [loadingPercentage, setLoadingPercentage] = useState("0%")
+  const [distributedCoreParam, setDistributedCoreParam] = useState("all")
+  const [populationSizeParam, setPopulationSizeParam] = useState(1000)
+  const [generationParam, setGenerationParam] = useState(100)
+  const [maxTimeParam, setMaxTimeParam] = useState(5000)
 
   const navigateToHome = () => {
     setData(null)
@@ -78,9 +81,10 @@ export default function OutputPage() {
         fitnessFunction: data.problem.fitnessFunction,
         defaultPayoffFunction: data.problem.playerPayoffFunction,
         conflictSet: data.problem.conflictSet,
-        isMaximizing: data.problem.isMaximizing,
-        evaluation: evaluationParam
-
+        distributedCores: distributedCoreParam,
+        populationSize: populationSizeParam,
+        generation: generationParam,
+        maxTime: maxTimeParam,
       }
       setIsLoading(true);
       await connectWebSocket()
@@ -176,9 +180,15 @@ export default function OutputPage() {
         </div>
         <div className="param-box">
           {/* <p className='estimated-time'>Estimated time for insight running: <span className="bold">{` ${data.estimatedWaitingTime || 1} minute(s)`}</span> </p> */}
-          <ParamSettingBox 
-            evaluation={evaluationParam}
-            setEvaluation={setEvaluationParam}
+          <ParamSettingBox
+            distributedCoreParam={distributedCoreParam}
+            setDistributedCoreParam={setDistributedCoreParam}
+            generationParam={generationParam}
+            setGenerationParam={setGenerationParam}
+            populationSizeParam={populationSizeParam}
+            setPopulationSizeParam={setPopulationSizeParam}
+            maxTimeParam={maxTimeParam}
+            setMaxTimeParam={setMaxTimeParam}
           />
           <div className="btn insight-btn" onClick={handleGetMoreInsights}>
             <p>Get more insights</p>
