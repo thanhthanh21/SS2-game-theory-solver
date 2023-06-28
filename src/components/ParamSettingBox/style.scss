@@ -1,12 +1,14 @@
 .param-setting-box {
     background: var(--grey);
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 50px;
     flex-direction: column;
-    gap: 35px;
+    // gap: 35px;
     justify-content: center;
     width: fit-content;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     gap: 20px;
 
@@ -15,11 +17,11 @@
         gap: 20px;
         align-items: center;
         position: relative;
-        width: 550px;
+        width: 500px;
         justify-content: space-between;
         .text {
             display: flex;
-            gap: 20px;
+            gap: 10px;
         }
 
         .bold {
@@ -28,6 +30,11 @@
             line-height: 30px;
         }
 
+        select {
+            padding: 10px 5px;
+            width: 150px;
+            font-size: 12px;;
+        }
 
 
         .info {
