@@ -22,7 +22,7 @@ export default function InsightPage() {
     const handleExportToExcel = async () => {
         const workbook = XLSX.utils.book_new();
         const sheet1 = XLSX.utils.aoa_to_sheet([
-            ['Iteration', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA'],
+            ['Iteration', 'NSGAII', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
         ])
 
         const totalRun = appData.insights.data.fitnessValues.NSGAII.length
@@ -31,23 +31,29 @@ export default function InsightPage() {
         for (let i = 0; i < totalRun; i++) {
             const row = [i + 1,
             appData.insights.data.fitnessValues.NSGAII[i],
+            appData.insights.data.fitnessValues.NSGAIII[i],
             appData.insights.data.fitnessValues.eMOEA[i],
             appData.insights.data.fitnessValues.PESA2[i],
-            appData.insights.data.fitnessValues.VEGA[i]]
+            appData.insights.data.fitnessValues.VEGA[i],
+            appData.insights.data.fitnessValues.PAES[i],
+            appData.insights.data.fitnessValues.IBEA[i]]
             XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 })
         }
 
 
         const sheet2 = XLSX.utils.aoa_to_sheet([
-            ['Iteration', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA'],
+            ['Iteration', 'NSGAII', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
         ])
 
         for (let i = 0; i < totalRun; i++) {
             const row = [i + 1,
             appData.insights.data.runtimes.NSGAII[i],
+            appData.insights.data.runtimes.NSGAIII[i],
             appData.insights.data.runtimes.eMOEA[i],
             appData.insights.data.runtimes.PESA2[i],
-            appData.insights.data.runtimes.VEGA[i]]
+            appData.insights.data.runtimes.VEGA[i],
+            appData.insights.data.runtimes.PAES[i],
+            appData.insights.data.runtimes.IBEA[i]]
             XLSX.utils.sheet_add_aoa(sheet2, [row], { origin: -1 })
         }
 
@@ -98,10 +104,10 @@ export default function InsightPage() {
                 tension: 0.1
             },
             {
-                label: 'eMOEA',
-                data: appData.insights.data.runtimes.eMOEA,
+                label: 'NSGAIII',
+                data: appData.insights.data.runtimes.NSGAIII,
                 fill: false,
-                borderColor: '#3795BD',
+                borderColor: '#45CFDD',
                 tension: 0.1
             },
             {
@@ -116,6 +122,20 @@ export default function InsightPage() {
                 data: appData.insights.data.runtimes.VEGA,
                 fill: false,
                 borderColor: '#EBB02D',
+                tension: 0.1
+            },
+            {
+                label: 'PAES',
+                data: appData.insights.data.runtimes.PAES,
+                fill: false,
+                borderColor: '#00DFA2',
+                tension: 0.1
+            },
+            {
+                label: 'IBEA',
+                data: appData.insights.data.runtimes.IBEA,
+                fill: false,
+                borderColor: '#6527BE',
                 tension: 0.1
             }
         ]

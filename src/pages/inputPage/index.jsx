@@ -166,7 +166,7 @@ export default function InputPage() {
                 //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
                 properties.push(await specialPlayerWorkSheet[`A${i + 1}`].v)
                 weights.push(await specialPlayerWorkSheet[`B${i + 1}`].v)
-            }
+            }   
             return {
                 properties,
                 weights

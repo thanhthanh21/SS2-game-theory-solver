@@ -104,15 +104,22 @@ export default function InputProcessingPage() {
                 maxTimeParam={maxTimeParam}
                 setMaxTimeParam={setMaxTimeParam}
             />
+            {
+                algorithm == 'PAES' &&
+                <p className="error-text">Population size takes no effect for PAES algorithm</p>
 
+            }
             <div className="algo-chooser">
                 <p className='algorithm-text bold'>Choose an algorithm: </p>
 
                 <select name="" id="" value={algorithm} onChange={handleChange} className='algorithm-select'>
                     <option value="NSGAII">NSGAII</option>
+                    <option value="NSGAIII">NSGAIII</option>
                     <option value="eMOEA">εMOEA</option>
                     <option value="PESA2">PESA2</option>
                     <option value="VEGA">VEGA</option>
+                    <option value="PAES">PAES</option>
+                    <option value="IBEA">IBEA</option>
                 </select>
             </div>
 

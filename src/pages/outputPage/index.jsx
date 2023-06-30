@@ -30,7 +30,7 @@ export default function OutputPage() {
   const [sessionCode, setSessionCode] = useState(v4())
   const [loadingMessage, setLoadingMessage] = useState("Processing to get problem insights, please wait...")
   const [loadingEstimatedTime, setLoadingEstimatedTime] = useState(null)
-  const [loadingPercentage, setLoadingPercentage] = useState("0%")
+  const [loadingPercentage, setLoadingPercentage] = useState()
   const [distributedCoreParam, setDistributedCoreParam] = useState("all")
   const [populationSizeParam, setPopulationSizeParam] = useState(1000)
   const [generationParam, setGenerationParam] = useState(100)
@@ -161,28 +161,16 @@ export default function OutputPage() {
   const onPrivateMessage = (payload) => {
     let payloadData = JSON.parse(payload.body);
 
-    const message = payloadData.message;
 
     // some return data are to show the progress, some are not
+    // if the data is to show the progress, then it will have the estimated time and percentage
     if (payloadData.inProgress) {
-      const isFirstRun = payloadData.firstRun
-      const percentage = Math.floor((payloadData.generation / 40) * 100) + "%"// there will be 40 run for the problem
+      setLoadingEstimatedTime(payloadData.minuteLeft)
+      setLoadingPercentage(payloadData.percentage)
+    } 
 
-      // showing estimated time, percentage and message
-      if (!loadingEstimatedTime) {
-        // the estimated time is calculated by multiply the first run time with 70 (run 10 times for each of 4 algorithms, with e-MOEa takes long as 3 times as other algorthms)
-        const totalEstimatedTime = "Estimated total " + (Math.floor(payloadData.runtime * 70 / 60) || 1) + " minute(s)" // in minutes
-        setLoadingEstimatedTime(totalEstimatedTime)
-        setLoadingMessage(message)
-      } else {
-        setLoadingMessage(message)
-      }
-      setLoadingPercentage(percentage)
-    } else {
-      // only show message
-      setLoadingMessage(message)
+    setLoadingMessage(payloadData.message)
 
-    }
   }
 
 
