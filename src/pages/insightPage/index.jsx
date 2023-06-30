@@ -22,7 +22,7 @@ export default function InsightPage() {
     const handleExportToExcel = async () => {
         const workbook = XLSX.utils.book_new();
         const sheet1 = XLSX.utils.aoa_to_sheet([
-            ['Iteration', 'NSGAII', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
+            ['Iteration', 'NSGAII', 'NSGAIII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
         ])
 
         const totalRun = appData.insights.data.fitnessValues.NSGAII.length
@@ -42,7 +42,7 @@ export default function InsightPage() {
 
 
         const sheet2 = XLSX.utils.aoa_to_sheet([
-            ['Iteration', 'NSGAII', 'NSGAII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
+            ['Iteration', 'NSGAII', 'NSGAIII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
         ])
 
         for (let i = 0; i < totalRun; i++) {
