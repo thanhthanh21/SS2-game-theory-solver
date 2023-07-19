@@ -50,6 +50,7 @@ export default function OutputPage() {
 
   const handleExportToExcel = async () => {
     const workbook = XLSX.utils.book_new();
+    // write result data to sheet 1
     const sheet1 = XLSX.utils.aoa_to_sheet([
       ["Fitness value", appData.result.data.fitnessValue],
       ["Used algorithm", appData.result.params.usedAlgorithm],
@@ -57,12 +58,14 @@ export default function OutputPage() {
       ["Player name", "Choosen strategy name", "Payoff value"],
     ]);
 
+    // append players data to sheet 1
     appData.result.data.players.forEach(player => {
       const row = [player.playerName, player.strategyName, player.payoff];
       XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
     })
 
 
+    // write parameter configurations to sheet 2
     const numberOfCores = appData.result.params.distributedCoreParam == 'all' ? 'All available cores' : appData.result.params.distributedCoreParam + " cores"
     const sheet2 = XLSX.utils.aoa_to_sheet([
       ["Number of distributed cores", numberOfCores],
@@ -71,6 +74,7 @@ export default function OutputPage() {
       ["Optimization execution max time (in milliseconds)", appData.result.params.maxTimeParam],
     ]);
 
+    // write computer specs to sheet 3
     const sheet3 = XLSX.utils.aoa_to_sheet([
       ["Operating System Family", appData.result.data.computerSpecs.osFamily],
       ["Operating System Manufacturer", appData.result.data.computerSpecs.osManufacturer],
@@ -81,12 +85,13 @@ export default function OutputPage() {
       ["Total Memory", appData.result.data.computerSpecs.totalMemory],
     ]);
 
+    // append sheets to workbook
     XLSX.utils.book_append_sheet(workbook, sheet1, 'Optiomal solution');
     XLSX.utils.book_append_sheet(workbook, sheet2, 'Parameter Configurations');
     XLSX.utils.book_append_sheet(workbook, sheet3, 'Computer Specifications');
 
 
-
+    // write workbook to file
     const wbout = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/octet-stream' });
     saveAs(blob, 'result.xlsx');
@@ -110,11 +115,10 @@ export default function OutputPage() {
         generation: generationParam,
         maxTime: maxTimeParam,
       }
+      
       setIsLoading(true);
-      await connectWebSocket()
-      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/problem-result-insights/${sessionCode}`, body);
-      console.log("insight results");
-      console.log(res.data.data);
+      await connectWebSocket() // connect to websocket to get the progress percentage
+      const res = await axios.post(`http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/api/problem-result-insights/${sessionCode}`, body);
       setIsLoading(false);
 
       const insights = {
@@ -128,9 +132,8 @@ export default function OutputPage() {
       }
       setAppData({ ...appData, insights });
       closeWebSocketConnection()
-      navigate('/insights')
+      navigate('/insights') // navigate to insights page
     } catch (err) {
-      console.log(err);
       setIsLoading(false);
       displayPopup("Something went wrong!", "Get insights failed!, please contact the admin!", true)
     }
@@ -138,7 +141,7 @@ export default function OutputPage() {
   }
 
   const connectWebSocket = async () => {
-    let Sock = new SockJS(`${process.env.REACT_APP_BACKEND_URL}/ws`);
+    let Sock = new SockJS(`http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/ws`);
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
   }

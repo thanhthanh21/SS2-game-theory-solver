@@ -218,6 +218,7 @@ export default function InputPage() {
                         }
                     }
 
+                    // CHECK IF THE STRATEGY HAS PROPERTIES
                     if (!properties.length) {
                         errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow + i}. Properties of strategy are invalid`
                         throw new Error()
@@ -230,6 +231,7 @@ export default function InputPage() {
 
                 }
                 
+                // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
                 let allStrategiesHaveSameNumOfProps = strategies.every(strategy => {
                     const firstStrategy = strategies[0]
                     return strategy.properties.length = firstStrategy.properties.length
@@ -270,6 +272,7 @@ export default function InputPage() {
             let col = 0;
             let currentCell = await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
 
+            // loop until there is a cell contains data
             while (currentCell) {
                 const string = currentCell.v
                 const conflict = string.replace(/[( )]/g, '').split(",").map((item) => parseInt(item))
@@ -280,9 +283,10 @@ export default function InputPage() {
                     rightPlayerStrategy: conflict[3]
                 })
 
-                col++;
+                col++; // move to the right cell
                 currentCell = await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
 
+                // after moving to the right cell, if the cell is empty, move to the next row
                 if (!currentCell) {
                     row++;
                     col = 0;
@@ -307,6 +311,7 @@ export default function InputPage() {
     const validateForm = () => {
         let error = false
 
+        // check if the problem name is empty
         if (!problemName) {
             setProblemNameError("Problem name must not be empty");
             error = true;
@@ -315,6 +320,7 @@ export default function InputPage() {
         }
 
         if (specialPlayerExists) {
+            // if special player exists, then the number of special players must not be empty
             if (!specialPlayerPropsNum) {
                 setSpecialPlayerPropsNumError("Special player properties must not be empty");
                 error = true;
@@ -323,7 +329,7 @@ export default function InputPage() {
             }
         }
 
-
+        // check if the number of normal players is empty
         if (!normalPlayerNum) {
             setNormalPlayerNumError("Normal player number must not be empty");
             error = true;
@@ -331,6 +337,7 @@ export default function InputPage() {
             setNormalPlayerNumError("");
         }
 
+        // check if the number of normal player properties is empty
         if (!normalPlayerPropsNum) {
             setNormalPlayerPropsNumError("Normal player properties must not be empty");
             error = true;
@@ -338,6 +345,7 @@ export default function InputPage() {
             setNormalPlayerPropsNumError("");
         }
 
+        // check if the number of strategies is empty
         if (!fitnessFunction) {
             setFitnessFunctionError("Fitness function must not be empty");
             error = true;
@@ -345,6 +353,7 @@ export default function InputPage() {
             setFitnessFunctionError("");
         }
 
+        // check if the number of strategies is empty
         if (!playerPayoffFunction) {
             setPlayerPayoffFunctionError("Player payoff function must not be empty");
             error = true;
@@ -352,7 +361,7 @@ export default function InputPage() {
             setPlayerPayoffFunctionError("");
         }
 
-        // if there is no error
+        // if there is no error, return true
         if (error) {
             return false
         }
@@ -364,6 +373,7 @@ export default function InputPage() {
         const workbook = XLSX.utils.book_new();
         let payoffFunction = playerPayoffFunction;
 
+        // write problem information to sheet1
         const sheet1 = XLSX.utils.aoa_to_sheet([
             ["Problem name", problemName],
             ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],
@@ -374,55 +384,59 @@ export default function InputPage() {
             ["Player payoff function", payoffFunction]
         ]);
 
+    
         let isMaximizingRow = ["Is maximzing problem", "False"]
-
         if (isMaximizing) {
-            // add one more row
             isMaximizingRow = ["Is maximzing problem", "True"]
-
         }
+        // add isMaximizingRow to the end of sheet1
         XLSX.utils.sheet_add_aoa(sheet1, [isMaximizingRow], { origin: -1 });
 
 
-        XLSX.utils.book_append_sheet(workbook, sheet1, 'Problem information');
-
+        // if user choose to add special player, add sheet2
         if (specialPlayerExists) {
             const sheet2 = XLSX.utils.aoa_to_sheet([["Properties", "Weights"]]);
             XLSX.utils.book_append_sheet(workbook, sheet2, 'Special player');
         }
 
+        // Write the sheet3 with sample data
         const sheet3 = XLSX.utils.aoa_to_sheet([["Player 1's Name", "2 (Number of strategies)"]]);
         XLSX.utils.book_append_sheet(workbook, sheet3, 'Normal player');
 
-        // add some  example data for sheet3 
+        // add some  example data for sheet3 (base on the number of normal players user input)
         const row2 = ["Strategy 1's name"]
         const row3 = ["Strategy 2's name"]
+        // input the property placeholder as the number of normal player properties
         for (let i = 0; i < Number(normalPlayerPropsNum); i++) {
             row2.push(`Property ${i + 1}`)
             row3.push(`Property ${i + 1}`)
         }
-
+        
+        // add the row2 and row3 to the end of sheet3
         XLSX.utils.sheet_add_aoa(sheet3, [row2, row3], { origin: -1 })
+        // if the number of normal players is greater than 1, add one more player sample data
         if (Number(normalPlayerNum)) {
             const row4 = ["Player 2's Name", "3 (Number of strategies)"]
             const row5 = ["Strategy 1's name"]
             const row6 = ["Strategy 2's name"]
             const row7 = ["Strategy 3's name"]
-
+            
+            // input the property placeholder as the number of normal player properties
             for (let i = 0; i < Number(normalPlayerPropsNum); i++) {
                 row5.push(`Property ${i + 1}`)
                 row6.push(`Property ${i + 1}`)
                 row7.push(`Property ${i + 1}`)
             }
+            // add the row4, row5, row6, row7 to the end of sheet3
             XLSX.utils.sheet_add_aoa(sheet3, [row4, row5, row6, row7], { origin: -1 })
         }
 
-
+        // Write the sheet4(blank sheet) for user to input conflict matrix 
         const sheet4 = XLSX.utils.aoa_to_sheet([]);
         XLSX.utils.book_append_sheet(workbook, sheet4, 'Conflict matrix');
-
+        
+    
         const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
         const blob = new Blob([wbout], { type: 'application/octet-stream' });
         saveAs(blob, 'input.xlsx');
     };
@@ -431,7 +445,6 @@ export default function InputPage() {
         event.preventDefault();
         setExcelFile(event.dataTransfer.files[0]);
         event.target.classList.remove("dragging")
-        //TODO: handle file validation
     }
 
     const handleOnDragEnter = (event) => {

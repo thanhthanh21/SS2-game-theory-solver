@@ -21,43 +21,39 @@ export default function InsightPage() {
     
     const handleExportToExcel = async () => {
         const workbook = XLSX.utils.book_new();
-        const sheet1 = XLSX.utils.aoa_to_sheet([
-            ['Iteration', 'NSGAII', 'NSGAIII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
-        ])
+    
 
+        // write fitness values to the first sheet
+        const sheet1 = XLSX.utils.aoa_to_sheet([
+            ['Iteration', 'NSGAII', 'NSGAIII', 'eMOEA', 'PESA2', 'VEGA'],
+        ])
         const totalRun = appData.insights.data.fitnessValues.NSGAII.length
-        console.log("total Run");
-        console.log(totalRun);
         for (let i = 0; i < totalRun; i++) {
             const row = [i + 1,
             appData.insights.data.fitnessValues.NSGAII[i],
             appData.insights.data.fitnessValues.NSGAIII[i],
             appData.insights.data.fitnessValues.eMOEA[i],
             appData.insights.data.fitnessValues.PESA2[i],
-            appData.insights.data.fitnessValues.VEGA[i],
-            appData.insights.data.fitnessValues.PAES[i],
-            appData.insights.data.fitnessValues.IBEA[i]]
+            appData.insights.data.fitnessValues.VEGA[i]]
             XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 })
         }
 
 
+        // write runtime values to the second sheet
         const sheet2 = XLSX.utils.aoa_to_sheet([
-            ['Iteration', 'NSGAII', 'NSGAIII', 'eMOEA', 'PESA2', 'VEGA', 'PAES', 'IBEA'],
+            ['Iteration', 'NSGAII', 'NSGAIII', 'eMOEA', 'PESA2', 'VEGA'],
         ])
-
         for (let i = 0; i < totalRun; i++) {
             const row = [i + 1,
             appData.insights.data.runtimes.NSGAII[i],
             appData.insights.data.runtimes.NSGAIII[i],
             appData.insights.data.runtimes.eMOEA[i],
             appData.insights.data.runtimes.PESA2[i],
-            appData.insights.data.runtimes.VEGA[i],
-            appData.insights.data.runtimes.PAES[i],
-            appData.insights.data.runtimes.IBEA[i]]
+            appData.insights.data.runtimes.VEGA[i]]
             XLSX.utils.sheet_add_aoa(sheet2, [row], { origin: -1 })
         }
 
-
+        // write parameter configurations to the third sheet
         const numberOfCores = appData.insights.params.distributedCoreParam == 'all' ? 'All available cores' : appData.insights.params.distributedCoreParam + " cores"
         const sheet3 = XLSX.utils.aoa_to_sheet([
             ["Number of distributed cores", numberOfCores],
@@ -66,6 +62,7 @@ export default function InsightPage() {
             ["Optimization execution max time (milliseconds)", appData.insights.params.maxTimeParam],
         ]);
 
+        // write computer specifications to the fourth sheet
         const sheet4 = XLSX.utils.aoa_to_sheet([
             ["Operating System Family", appData.insights.data.computerSpecs.osFamily],
             ["Operating System Manufacturer", appData.insights.data.computerSpecs.osManufacturer],
@@ -76,11 +73,13 @@ export default function InsightPage() {
             ["Total Memory", appData.insights.data.computerSpecs.totalMemory],
         ]);
 
+        // add sheets to the workbook
         XLSX.utils.book_append_sheet(workbook, sheet1, 'Fitness Values')
         XLSX.utils.book_append_sheet(workbook, sheet2, 'Runtimes')
         XLSX.utils.book_append_sheet(workbook, sheet3, 'Parameter Configurations');
         XLSX.utils.book_append_sheet(workbook, sheet4, 'Computer Specifications');
 
+        // save the workbook
         const wbout = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([wbout], { type: 'application/octet-stream' });
         saveAs(blob, "insights.xlsx");
@@ -93,6 +92,8 @@ export default function InsightPage() {
         )
     }
 
+
+    // configure the graph data, 10 means 10 iterations
     const graphData = {
         labels: Array.from(Array(10).keys(), x => x + 1),
         datasets: [
@@ -111,6 +112,13 @@ export default function InsightPage() {
                 tension: 0.1
             },
             {
+                label: 'eMOEA',
+                data: appData.insights.data.runtimes.eMOEA,
+                fill: false,
+                borderColor: '#6527BE',
+                tension: 0.1
+            },
+            {
                 label: 'PESA2',
                 data: appData.insights.data.runtimes.PESA2,
                 fill: false,
@@ -122,20 +130,6 @@ export default function InsightPage() {
                 data: appData.insights.data.runtimes.VEGA,
                 fill: false,
                 borderColor: '#EBB02D',
-                tension: 0.1
-            },
-            {
-                label: 'PAES',
-                data: appData.insights.data.runtimes.PAES,
-                fill: false,
-                borderColor: '#00DFA2',
-                tension: 0.1
-            },
-            {
-                label: 'IBEA',
-                data: appData.insights.data.runtimes.IBEA,
-                fill: false,
-                borderColor: '#6527BE',
                 tension: 0.1
             }
         ]

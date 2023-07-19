@@ -10,8 +10,6 @@ import DataContext from "./context/DataContext";
 import InsightPage from "./pages/insightPage";
 import PopupContext from "./context/PopupContext";
 import Popup from './components/Popup'
-
-//TODO: about page
 function App() {
   const [appData, setAppData] = useState(null)
   const [guideSectionIndex, setGuideSectionIndex] = useState(0)
@@ -28,6 +26,8 @@ function App() {
       setPopupError(error)
     }
   }
+  console.log("Backend URL:");
+  console.log(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}`);
   return (
     <DataContext.Provider value={{ appData, setAppData, guideSectionIndex, setGuideSectionIndex }}>
       <PopupContext.Provider value={{ displayPopup }}>

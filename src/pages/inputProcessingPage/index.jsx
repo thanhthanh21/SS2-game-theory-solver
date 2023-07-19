@@ -40,7 +40,6 @@ export default function InputProcessingPage() {
 
     const handleSolveNow = async () => {
         try {
-            //TODO: here request
             const body = {
                 specialPlayer: appData.problem.specialPlayer,
                 normalPlayers: appData.problem.players,
@@ -52,13 +51,12 @@ export default function InputProcessingPage() {
                 populationSize: populationSizeParam,
                 generation: generationParam,
                 maxTime: maxTimeParam,
-                // evaluation: evaluationParam
             }
             setIsLoading(true);
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/game-theory-solver`, body);
-            console.log("result:");
+            console.log("MAKE a POST request to: ");
+            const res = await axios.post(`http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/api/game-theory-solver`, body);
+            // const reswait axios.post(`http://172.20.0.2:${process.env.REACT_APP_BACKEND_PORT}/api/game-theory-solver`, body);
             console.log(res.data.data);
-            // const res = await axios.post(`http://localhost:8080/api/game-theory-solver`, body);
             const runtime = res.data.data.runtime;
             const usedAlgorithm = res.data.data.algorithm;
 
@@ -78,6 +76,7 @@ export default function InputProcessingPage() {
             setIsLoading(false);
             navigate('/result')
         } catch (err) {
+            console.log(err);
             setIsLoading(false);
             displayPopup("Running failed", "Please check the dataset and try again or contact the admin!", true)
         }
